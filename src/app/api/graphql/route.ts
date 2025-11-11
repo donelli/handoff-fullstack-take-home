@@ -1,10 +1,5 @@
-import { startServerAndCreateNextHandler } from "@as-integrations/next";
-import { createApolloServer } from "~/graphql/server";
+import { startGraphqlAndGetNextHandler } from "~/server/server";
 
-const server = createApolloServer();
-
-const handler = startServerAndCreateNextHandler(server, {
-  context: async (req) => ({ req }),
-});
+const handler = startGraphqlAndGetNextHandler()
 
 export { handler as GET, handler as POST };

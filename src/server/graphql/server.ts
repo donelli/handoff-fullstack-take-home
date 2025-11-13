@@ -4,16 +4,18 @@ import { buildResolvers } from "./resolvers";
 import { MessagesService } from "../service/messages/messages.service";
 import { db } from "../db";
 import { MessagesRepository } from "../repository/messages/messages.repository";
+import { AuthService } from "../service/auth/auth.service";
 
-// Create the Apollo Server instance
 export function createApolloServer() {
   const messagesRepository = new MessagesRepository(db);
   const messagesService = new MessagesService(messagesRepository);
+  const authService = new AuthService();
 
   return new ApolloServer({
     typeDefs,
     resolvers: buildResolvers({
       messagesService,
+      authService,
     }),
   });
 }

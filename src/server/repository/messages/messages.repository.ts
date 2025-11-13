@@ -1,6 +1,6 @@
 import type { Message as PrismaMessage } from "generated/prisma";
 import type { DbClient } from "~/server/db";
-import type { Message } from "~/server/models/message";
+import type { Message } from "~/models/message";
 
 type AddMessagePayload = {
   text: string;

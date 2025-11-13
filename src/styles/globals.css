@@ -4,6 +4,7 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-size: var(--font-size-sm);
 }
 
 a {
@@ -13,4 +14,31 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+:root {
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  --border-sm: 4px;
+  --border-md: 8px;
+  --border-lg: 16px;
+
+  --border-size-sm: 1px;
+
+  --font-size-xs: 13px;
+  --font-size-sm: 14px;
+
+  --gray-100: #f7f7f7;
+  --gray-200: #e6e6e6;
+
+  --black: #111;
+  --white: #fff;
+
+  --card-border-color: var(--gray-200);
+  
+  --primary-color: var(--black);
+  --primary-foreground-color: var(--white);
 }

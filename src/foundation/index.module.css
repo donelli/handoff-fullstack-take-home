@@ -1,0 +1,30 @@
+
+.button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-sm);
+    border: none;
+    cursor: pointer;
+}
+
+.buttonPrimary {
+    background-color: var(--primary-color);
+    color: var(--primary-foreground-color);
+}
+
+.textBox {
+    border: 1px solid var(--card-border-color);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-sm);
+}
+
+.textBoxLabel {
+    font-weight: medium;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+}
+
+.textBoxContainer {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-md);
+}

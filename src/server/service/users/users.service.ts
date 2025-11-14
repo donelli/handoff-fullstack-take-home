@@ -10,4 +10,8 @@ export class UsersService {
   loadByIds(ids: number[]) {
     return this.usersRepository.loadByIds(ids);
   }
+
+  loadHomeownersByJobId(jobId: number) {
+    return this.usersRepository.loadHomeownersByJobId(jobId);
+  }
 }

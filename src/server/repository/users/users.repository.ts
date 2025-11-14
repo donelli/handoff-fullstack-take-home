@@ -37,6 +37,20 @@ export class UsersRepository {
     return allUsers.map((user) => this.mapToDomainUser(user));
   }
 
+  async loadHomeownersByJobId(jobId: number) {
+    const homeowners = await this.db.user.findMany({
+      where: {
+        jobsAsHomeowner: {
+          some: {
+            id: jobId,
+          },
+        },
+      },
+    });
+
+    return homeowners.map((user) => this.mapToDomainUser(user));
+  }
+
   mapToDomainUser(prismaUser: PrismaUser): User {
     return {
       name: prismaUser.name,

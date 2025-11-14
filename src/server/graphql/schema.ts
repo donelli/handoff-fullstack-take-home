@@ -30,6 +30,7 @@ export const typeDefs = gql`
     deletedAt: String
     deletedByUserId: Int
     deletedByUser: User
+    homeowners: [User!]
   }
 
   enum UserType {

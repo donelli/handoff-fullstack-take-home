@@ -61,6 +61,11 @@ export function buildResolvers(dependencies: ResolverDependencies) {
 
         return dataLoaders.users(context).load(parent.deletedByUserId);
       },
+      homeowners: (parent: JobModel) => {
+        return adaptServiceCall(() =>
+          usersService.loadHomeownersByJobId(parent.id),
+        );
+      },
     },
     Mutation: {
       login: (

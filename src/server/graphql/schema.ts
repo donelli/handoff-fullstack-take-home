@@ -25,6 +25,11 @@ export const typeDefs = gql`
     description: String!
     location: String!
     cost: Float!
+    createdByUserId: Int!
+    createdByUser: User!
+    deletedAt: String
+    deletedByUserId: Int
+    deletedByUser: User
   }
 
   enum UserType {

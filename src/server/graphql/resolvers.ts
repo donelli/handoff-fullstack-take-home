@@ -7,6 +7,8 @@ import type {
 } from "../service/jobs/jobs.service";
 import type { UsersService } from "../service/users/users.service";
 import type { RequestContext } from "../request_context";
+import { buildDataLoaders } from "./dataloaders";
+import type { JobModel } from "~/models/job";
 
 export type ResolverDependencies = {
   authService: AuthService;
@@ -17,13 +19,15 @@ export type ResolverDependencies = {
 export function buildResolvers(dependencies: ResolverDependencies) {
   const { authService, usersService, jobsService } = dependencies;
 
+  const dataLoaders = buildDataLoaders(dependencies);
+
   return {
     Query: {
       me: (_: unknown, __: unknown, context: RequestContext) => {
         return adaptServiceCall(() => authService.loadMe(context));
       },
       users: () => {
-        return adaptServiceCall(() => usersService.getAll());
+        return adaptServiceCall(() => usersService.loadAll());
       },
       jobs: (
         _: unknown,
@@ -36,6 +40,26 @@ export function buildResolvers(dependencies: ResolverDependencies) {
             context,
           }),
         );
+      },
+    },
+    Job: {
+      createdByUser: (
+        parent: JobModel,
+        _: unknown,
+        context: RequestContext,
+      ) => {
+        return dataLoaders.users(context).load(parent.createdByUserId);
+      },
+      deletedByUser: (
+        parent: JobModel,
+        _: unknown,
+        context: RequestContext,
+      ) => {
+        if (!parent.deletedByUserId) {
+          return null;
+        }
+
+        return dataLoaders.users(context).load(parent.deletedByUserId);
       },
     },
     Mutation: {

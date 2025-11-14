@@ -51,7 +51,7 @@ export class AuthService {
       throw new IncorrectUserOrPasswordError();
     }
 
-    const user = await this.usersRepository.getById(userId);
+    const user = await this.usersRepository.loadById(userId);
 
     if (!user) {
       throw new Error(
@@ -113,7 +113,7 @@ export class AuthService {
       throw new ProtectedRouteError();
     }
 
-    const user = await this.usersRepository.getById(userId);
+    const user = await this.usersRepository.loadById(userId);
     if (!user) {
       throw new Error("User of this token don't exist on the database");
     }

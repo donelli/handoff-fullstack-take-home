@@ -5,13 +5,13 @@ import { UserType, type User } from "~/models/user";
 export class UsersRepository {
   constructor(private readonly db: DbClient) {}
 
-  async getAll() {
+  async loadAll() {
     const allUsers = await this.db.user.findMany();
 
     return allUsers.map((user) => this.mapToDomainUser(user));
   }
 
-  async getById(id: number) {
+  async loadById(id: number) {
     const user = await this.db.user.findFirst({
       where: {
         id,
@@ -23,6 +23,18 @@ export class UsersRepository {
     }
 
     return this.mapToDomainUser(user);
+  }
+
+  async loadByIds(ids: number[]) {
+    const allUsers = await this.db.user.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return allUsers.map((user) => this.mapToDomainUser(user));
   }
 
   mapToDomainUser(prismaUser: PrismaUser): User {

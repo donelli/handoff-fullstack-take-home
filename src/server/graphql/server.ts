@@ -1,21 +1,28 @@
 import { ApolloServer } from "@apollo/server";
 import { typeDefs } from "./schema";
 import { buildResolvers } from "./resolvers";
-import { MessagesService } from "../service/messages/messages.service";
-import { db } from "../db";
-import { MessagesRepository } from "../repository/messages/messages.repository";
 import { AuthService } from "../service/auth/auth.service";
+import { UsersRepository } from "../repository/users/users.repository";
+import { db } from "../db";
+import { UsersService } from "../service/users/users.service";
+import { JobsRepository } from "../repository/jobs/jobs.repository";
+import { JobsService } from "../service/jobs/jobs.service";
+import type { RequestContext } from "../request_context";
 
 export function createApolloServer() {
-  const messagesRepository = new MessagesRepository(db);
-  const messagesService = new MessagesService(messagesRepository);
-  const authService = new AuthService();
+  const usersRepository = new UsersRepository(db);
+  const jobsRepository = new JobsRepository(db);
 
-  return new ApolloServer({
+  const authService = new AuthService(usersRepository);
+  const usersService = new UsersService(usersRepository);
+  const jobsService = new JobsService(jobsRepository);
+
+  return new ApolloServer<RequestContext>({
     typeDefs,
     resolvers: buildResolvers({
-      messagesService,
       authService,
+      usersService,
+      jobsService,
     }),
   });
 }

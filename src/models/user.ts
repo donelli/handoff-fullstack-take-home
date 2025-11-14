@@ -4,6 +4,7 @@ export enum UserType {
 }
 
 export type User = {
+  id: number;
   type: UserType;
   name: string;
 };

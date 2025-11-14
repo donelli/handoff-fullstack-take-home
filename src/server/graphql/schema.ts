@@ -1,15 +1,30 @@
 import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
-  type Message {
-    id: ID!
-    text: String!
-    createdAt: String!
+  type Query {
+    users: [User!]!
+    jobs(filter: JobsFilterInput!): LoadJobsResult!
+    me: User!
   }
 
-  type Query {
-    hello: String!
-    messages: [Message!]!
+  type LoadJobsResult {
+    page: Int!
+    limit: Int!
+    data: [Job!]!
+  }
+
+  input JobsFilterInput {
+    createdByUserId: Int
+    homeownerId: Int
+    page: Int
+    limit: Int
+  }
+
+  type Job {
+    id: Int!
+    description: String!
+    location: String!
+    cost: Float!
   }
 
   enum UserType {
@@ -18,6 +33,7 @@ export const typeDefs = gql`
   }
 
   type User {
+    id: Int!
     name: String!
     type: UserType!
   }
@@ -39,8 +55,40 @@ export const typeDefs = gql`
 
   union LoginResult = LoginSuccess | IncorrectUserOrPasswordError
 
+  enum JobStatus {
+    PLANNING
+    IN_PROGRESS
+    COMPLETED
+    CANCELED
+  }
+
+  input CreateJobInput {
+    description: String!
+    location: String!
+    cost: Float!
+    homeownerIds: [Int!]!
+    createdByUserId: Int!
+  }
+
+  type CreateJobResult {
+    data: Job
+  }
+
+  input UpdateJobInput {
+    description: String
+    location: String
+    cost: Float
+    homeownerIds: [Int!]
+  }
+
+  type UpdateJobResult {
+    data: Job
+  }
+
   type Mutation {
-    addMessage(text: String!): Message!
     login(input: LoginInput!): LoginResult!
+    createJob(input: CreateJobInput!): CreateJobResult!
+    updateJob(id: Int!, input: UpdateJobInput!): UpdateJobResult!
+    deleteJob(id: Int!): Boolean!
   }
 `;

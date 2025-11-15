@@ -1,6 +1,11 @@
 import type { JobModel } from "~/models/job";
 import type { DbClient } from "~/server/db";
-import type { Prisma, Job as PrismaJob } from "generated/prisma";
+import {
+  type JobStatus as PrismaJobStatus,
+  type Prisma,
+  type Job as PrismaJob,
+} from "generated/prisma";
+import { JobStatus } from "~/models/job";
 
 type LoadJobsPayload = {
   createdByUserId?: number;
@@ -12,6 +17,7 @@ type LoadJobsPayload = {
 type LoadJobsResult = {
   page: number;
   limit: number;
+  total: number;
   data: JobModel[];
 };
 
@@ -65,18 +71,22 @@ export class JobsRepository {
       };
     }
 
-    const jobs = await this.db.job.findMany({
-      skip: limit * (page - 1),
-      take: limit,
-      where,
-      orderBy: {
-        createdAt: "asc",
-      },
-    });
+    const [jobs, total] = await Promise.all([
+      this.db.job.findMany({
+        skip: limit * (page - 1),
+        take: limit,
+        where,
+        orderBy: {
+          createdAt: "asc",
+        },
+      }),
+      this.db.job.count({ where }),
+    ]);
 
     return {
       page,
       limit,
+      total,
       data: jobs.map((job) => this.mapJobToDomain(job)),
     };
   }
@@ -152,8 +162,24 @@ export class JobsRepository {
       createdByUserId: job.createdByUserId,
       cost: job.cost,
       location: job.location,
-      deletedAt: job.deletedAt,
+      deletedAt: job.deletedAt?.toISOString(),
       deletedByUserId: job.deletedByUserId,
+      status: this.mapJobStatusToDomain(job.status),
+      createdAt: job.createdAt.toISOString(),
+      updatedAt: job.updatedAt.toISOString(),
     };
+  }
+
+  mapJobStatusToDomain(status: PrismaJobStatus): JobStatus {
+    switch (status) {
+      case "PLANNING":
+        return JobStatus.PLANNING;
+      case "IN_PROGRESS":
+        return JobStatus.IN_PROGRESS;
+      case "COMPLETED":
+        return JobStatus.COMPLETED;
+      case "CANCELED":
+        return JobStatus.CANCELED;
+    }
   }
 }

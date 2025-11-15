@@ -11,6 +11,7 @@ export const typeDefs = gql`
   type LoadJobsResult {
     page: Int!
     limit: Int!
+    total: Int!
     data: [Job!]!
   }
 
@@ -26,6 +27,9 @@ export const typeDefs = gql`
     description: String!
     location: String!
     cost: Float!
+    status: JobStatus!
+    createdAt: String!
+    updatedAt: String!
     createdByUserId: Int!
     createdByUser: User!
     deletedAt: String

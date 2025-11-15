@@ -65,7 +65,7 @@ export class AuthService {
         userType: user.type,
         username: user.name,
       },
-      env.JWT_SECRET as string,
+      env.JWT_SECRET,
       {
         expiresIn: JWT_EXPIRATION,
       },
@@ -92,7 +92,7 @@ export class AuthService {
 
     const token = authorizationHeader.substring(7);
 
-    const decodedJwt = jwt.verify(token, env.JWT_SECRET as string) as {
+    const decodedJwt = jwt.verify(token, env.JWT_SECRET) as {
       userId: number;
       userType: string;
       username: string;

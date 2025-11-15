@@ -4,6 +4,7 @@ export const typeDefs = gql`
   type Query {
     users: [User!]!
     jobs(filter: JobsFilterInput!): LoadJobsResult!
+    job(id: Int!): Job
     me: User!
   }
 

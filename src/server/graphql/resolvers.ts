@@ -41,6 +41,14 @@ export function buildResolvers(dependencies: ResolverDependencies) {
           }),
         );
       },
+      job: (_: unknown, { id }: { id: number }, context: RequestContext) => {
+        return adaptServiceCall(() =>
+          jobsService.loadById({
+            context,
+            id,
+          }),
+        );
+      },
     },
     Job: {
       createdByUser: (

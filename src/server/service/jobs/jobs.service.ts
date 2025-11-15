@@ -30,6 +30,11 @@ export type DeleteJobPayload = {
   context: RequestContext;
 };
 
+type LoadJobByIdPayload = {
+  id: number;
+  context: RequestContext;
+};
+
 export class JobsService {
   constructor(private readonly jobsRepository: JobsRepository) {}
 
@@ -86,6 +91,18 @@ export class JobsService {
     return { data: createdJob };
   }
 
+  async loadById(payload: LoadJobByIdPayload) {
+    const { context, id } = payload;
+
+    if (!context.userData) {
+      throw new ProtectedRouteError();
+    }
+
+    const job = await this.jobsRepository.loadById(id);
+
+    return job;
+  }
+
   async update(payload: UpdateJobPayload) {
     const { context, id: jobId, ...body } = payload;
 
@@ -101,7 +118,7 @@ export class JobsService {
       throw new Error("Only contractors can update jobs");
     }
 
-    const job = await this.jobsRepository.loadById(jobId);
+    const job = await this.loadById({ id: jobId, context });
     if (!job) {
       throw new Error("Job not found");
     }
@@ -129,7 +146,7 @@ export class JobsService {
       throw new Error("Only contractors can update jobs");
     }
 
-    const job = await this.jobsRepository.loadById(id);
+    const job = await this.loadById({ id, context });
     if (!job) {
       throw new Error("Job not found");
     }

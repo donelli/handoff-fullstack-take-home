@@ -10,7 +10,10 @@ export type JobModel = {
   description: string;
   createdByUserId: number;
   cost: number;
+  status: JobStatus;
   location: string;
-  deletedAt?: Date | null;
+  deletedAt?: string | null;
   deletedByUserId?: number | null;
+  createdAt: string;
+  updatedAt: string;
 };

@@ -1,0 +1,16 @@
+.main {
+    padding: var(--spacing-lg);
+    background-color: var(--gray-100);
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.headerTitle {
+    margin: 0;
+}

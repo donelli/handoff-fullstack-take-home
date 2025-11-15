@@ -4,6 +4,9 @@
     border-radius: var(--border-sm);
     border: none;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
 }
 
 .buttonPrimary {
@@ -27,4 +30,9 @@
     display: flex;
     flex-direction: column;
     margin-bottom: var(--spacing-md);
+}
+
+.tag {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-sm);
 }

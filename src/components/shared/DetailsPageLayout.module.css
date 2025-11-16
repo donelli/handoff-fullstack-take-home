@@ -15,6 +15,11 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
   border-bottom: var(--border-size-sm) solid var(--card-border-color);
+  position: relative;
+}
+
+.headerAction {
+  margin-left: auto;
 }
 
 .backButton {

@@ -14,10 +14,11 @@ type DetailsPageLayoutProps = {
     onClick: () => void;
     loading?: boolean;
   };
+  headerAction?: ReactNode;
 };
 
 export function DetailsPageLayout(props: DetailsPageLayoutProps) {
-  const { title, children, footerAction } = props;
+  const { title, children, footerAction, headerAction } = props;
   const router = useRouter();
 
   return (
@@ -27,6 +28,7 @@ export function DetailsPageLayout(props: DetailsPageLayoutProps) {
           <MdChevronLeft size={16} />
         </button>
         <h1 className={styles.title}>{title}</h1>
+        {headerAction && <div className={styles.headerAction}>{headerAction}</div>}
       </header>
       <div className={styles.body}>{children}</div>
       {footerAction && (

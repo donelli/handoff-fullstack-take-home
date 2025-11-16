@@ -5,7 +5,7 @@ type ButtonProps = {
   children: React.ReactNode;
   onClick?: () => void;
   type?: HTMLButtonElement["type"];
-  variant?: "primary";
+  variant?: "primary" | "danger";
   loading?: boolean;
 };
 
@@ -17,7 +17,12 @@ export function Button(props: ButtonProps) {
     variant = "primary",
     loading,
   } = props;
-  const variantClass = variant === "primary" ? styles.buttonPrimary : "";
+  const variantClass =
+    variant === "primary"
+      ? styles.buttonPrimary
+      : variant === "danger"
+        ? styles.buttonDanger
+        : "";
 
   return (
     <button

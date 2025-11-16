@@ -63,7 +63,7 @@ export default function CreateJobPage() {
     const id = result.data?.createJob.data?.id;
 
     if (id) {
-      router.push(`/jobs/${id}`);
+      router.replace(`/jobs/${id}`);
     } else {
       showErrorToast("An unexpected error ocurred!");
     }

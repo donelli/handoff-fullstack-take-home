@@ -7,11 +7,21 @@
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
+    transition: background-color 0.2s;
 }
 
 .buttonPrimary {
     background-color: var(--primary-color);
     color: var(--primary-foreground-color);
+}
+
+.buttonDanger {
+    background-color: var(--red-500);
+    color: var(--white);
+}
+
+.buttonDanger:hover {
+    background-color: #dc2626;
 }
 
 .textBox {

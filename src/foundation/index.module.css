@@ -18,6 +18,7 @@
     border: 1px solid var(--card-border-color);
     padding: var(--spacing-sm);
     border-radius: var(--border-sm);
+    font-family: inherit;
 }
 
 .textBoxLabel {

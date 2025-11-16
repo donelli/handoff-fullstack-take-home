@@ -5,5 +5,8 @@ export function useToast() {
     showErrorToast: (message: string) => {
       toast.error(message);
     },
+    showSuccessToast: (message: string) => {
+      toast.success(message);
+    },
   };
 }

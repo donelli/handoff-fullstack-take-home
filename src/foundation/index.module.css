@@ -62,3 +62,8 @@
     flex-direction: column;
     margin-bottom: var(--spacing-md);
 }
+
+.infoFieldContainerNoBackground {
+    background-color: transparent !important;
+    padding: 0;
+}

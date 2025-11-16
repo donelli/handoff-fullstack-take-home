@@ -3,15 +3,21 @@
 import { useParams } from "next/navigation";
 import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
 import { InfoField } from "~/foundation/info-field";
-import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
 import { Chat } from "~/components/shared/Chat";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql, useMutation } from "@apollo/client";
 import { useUserContext } from "~/hooks/useUserContext";
-import { type JobStatus } from "~/models/job";
+import { JobStatus } from "~/models/job";
 import { Spinner } from "~/foundation/spinner";
 import { useToast } from "~/foundation/hooks/useToast";
 import { type User } from "~/models/user";
 import { HomeownersList } from "~/components/shared/HomeownersList";
+import { StatusToggle } from "~/foundation/StatusToggle";
+import {
+  MdCheckCircleOutline,
+  MdOutlineBlock,
+  MdOutlineBuildCircle,
+  MdOutlineFilterTiltShift,
+} from "react-icons/md";
 
 const JOB_QUERY = gql`
   query GetJob($id: Int!) {
@@ -35,33 +41,72 @@ const JOB_QUERY = gql`
   }
 `;
 
+type JobData = {
+  id: number;
+  description: string;
+  location: string;
+  cost: number;
+  status: JobStatus;
+  createdAt: string;
+  updatedAt: string;
+  createdByUser: User;
+  homeowners: User[];
+};
+
 type JobQueryResponse = {
-  job: {
-    id: number;
-    description: string;
-    location: string;
-    cost: number;
-    status: JobStatus;
-    createdAt: string;
-    updatedAt: string;
-    createdByUser: User;
-    homeowners: User[];
-  } | null;
+  job: JobData | null;
+};
+
+const CHANGE_JOB_STATUS_MUTATION = gql`
+  mutation ChangeJobStatus($id: Int!, $status: JobStatus!) {
+    changeJobStatus(id: $id, status: $status) {
+      data {
+        id
+      }
+    }
+  }
+`;
+
+type ChangeJobStatusMutationResponse = {
+  changeJobStatus: {
+    data: JobData;
+  };
 };
 
 export default function JobDetailsPage() {
   const params = useParams();
   const jobId = Number(params.id);
   const { formatDate, formatCurrency } = useUserContext();
-  const { showErrorToast } = useToast();
+  const { showErrorToast, showSuccessToast } = useToast();
+  const [changeJobStatus, { loading: changeJobStatusLoading }] =
+    useMutation<ChangeJobStatusMutationResponse>(CHANGE_JOB_STATUS_MUTATION);
 
-  const { data, loading, error } = useQuery<JobQueryResponse>(JOB_QUERY, {
-    variables: { id: jobId },
-    fetchPolicy: "network-only",
-    onError: () => {
-      showErrorToast("Failed to load job details");
+  const { data, loading, error, refetch } = useQuery<JobQueryResponse>(
+    JOB_QUERY,
+    {
+      variables: { id: jobId },
+      fetchPolicy: "network-only",
+      onError: () => {
+        showErrorToast("Failed to load job details");
+      },
     },
-  });
+  );
+
+  const handleChangeJobStatus = async (status: JobStatus) => {
+    try {
+      const result = await changeJobStatus({
+        variables: { id: jobId, status },
+      });
+
+      if (result.data?.changeJobStatus.data) {
+        showSuccessToast("Job status changed successfully");
+        void refetch();
+      }
+    } catch (error) {
+      console.error(error);
+      showErrorToast("Failed to change job status");
+    }
+  };
 
   if (loading) {
     return (
@@ -135,7 +180,52 @@ export default function JobDetailsPage() {
         <div style={{ flex: "1 1 70%" }}>
           <InfoField
             label="Status"
-            value={<JobStatusBadge status={job.status} />}
+            noBackground
+            value={
+              <StatusToggle
+                loading={changeJobStatusLoading}
+                value={job.status}
+                onChange={handleChangeJobStatus}
+                options={[
+                  {
+                    label: "Planning",
+                    value: JobStatus.PLANNING,
+                    icon: (color: string) => (
+                      <MdOutlineFilterTiltShift color={color} size={16} />
+                    ),
+                    color: "var(--orange-500)",
+                    selectedBackgroundColor: "var(--orange-100)",
+                  },
+                  {
+                    label: "In Progress",
+                    value: JobStatus.IN_PROGRESS,
+                    icon: (color: string) => (
+                      <MdOutlineBuildCircle color={color} size={16} />
+                    ),
+                    color: "var(--blue-500)",
+                    selectedBackgroundColor: "var(--blue-100)",
+                  },
+                  {
+                    label: "Completed",
+                    value: JobStatus.COMPLETED,
+                    icon: (color: string) => (
+                      <MdCheckCircleOutline color={color} size={16} />
+                    ),
+                    color: "var(--green-500)",
+                    selectedBackgroundColor: "var(--green-100)",
+                  },
+                  {
+                    label: "Canceled",
+                    value: JobStatus.CANCELED,
+                    icon: (color: string) => (
+                      <MdOutlineBlock color={color} size={16} />
+                    ),
+                    color: "var(--red-500)",
+                    selectedBackgroundColor: "var(--red-100)",
+                  },
+                ]}
+              />
+            }
           />
 
           <InfoField label="Description" value={job.description} />

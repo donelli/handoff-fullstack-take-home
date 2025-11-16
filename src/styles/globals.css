@@ -39,9 +39,17 @@ a {
   --gray-200: #e6e6e6;
   --gray-700: #374151;
 
+  --blue-100: #e6f2ff;
   --blue-500: #3b82f6;
+
+  --green-100: #d1fadf;
   --green-500: #10b981;
+
+  --red-100: #fee2e2;
   --red-500: #ef4444;
+
+  --orange-100: #fff7ed;
+  --orange-500: #f59e0b;
 
   --black: #111;
   --white: #fff;

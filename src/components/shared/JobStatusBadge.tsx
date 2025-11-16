@@ -17,10 +17,10 @@ export function JobStatusBadge({ status }: { status: JobStatus }) {
 
   const statusIcon = {
     [JobStatus.PLANNING]: (
-      <MdOutlineFilterTiltShift color="var(--blue-500)" size={16} />
+      <MdOutlineFilterTiltShift color="var(--orange-500)" size={16} />
     ),
     [JobStatus.IN_PROGRESS]: (
-      <MdOutlineBuildCircle color="var(--green-500)" size={16} />
+      <MdOutlineBuildCircle color="var(--blue-500)" size={16} />
     ),
     [JobStatus.COMPLETED]: (
       <MdCheckCircleOutline color="var(--green-500)" size={16} />

@@ -10,7 +10,8 @@
     width: 420px;
     padding: var(--spacing-lg);
     border: var(--border-size-sm) solid var(--card-border-color);
-    border-radius: var(--border-md)
+    border-radius: var(--border-md);
+    background-color: var(--white);
 }
 
 .loginTitle {

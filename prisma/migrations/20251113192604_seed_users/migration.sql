@@ -1,3 +1,3 @@
 INSERT INTO User (username, name, type) VALUES
-("contractor", "contractor", "CONTRACTOR"),
-("homeowner", "homeowner", "HOMEOWNER");
+("contractor", "Contractor User", "CONTRACTOR"),
+("homeowner", "Homeowner User", "HOMEOWNER");

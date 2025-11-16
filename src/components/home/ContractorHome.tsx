@@ -9,6 +9,7 @@ import {
   type IGetRowsParams,
 } from "ag-grid-community";
 import { useApolloClient, gql } from "@apollo/client";
+import Link from "next/link";
 import styles from "./ContractorHome.module.css";
 import { Button } from "~/foundation/button";
 import { type JobStatus } from "~/models/job";
@@ -120,7 +121,20 @@ export const ContractorHome = () => {
   const colDefs = useMemo<ColDef<LoadJobsJobModel>[]>(
     () => [
       { field: "id", headerName: "#", resizable: false, flex: 0.3 },
-      { field: "description", headerName: "Description" },
+      {
+        field: "description",
+        headerName: "Description",
+        cellRenderer: (
+          params: ValueFormatterParams<LoadJobsJobModel, string>,
+        ) => (
+          <Link
+            href={`/jobs/${params.data?.id ?? ""}`}
+            className={styles.jobLink}
+          >
+            {params.value}
+          </Link>
+        ),
+      },
       { field: "location", headerName: "Location" },
       {
         field: "status",

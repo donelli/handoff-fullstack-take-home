@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useAuth } from "~/providers/auth-provider";
 import { Avatar } from "./avatar";
 import styles from "./main-header.module.css";
@@ -16,7 +17,9 @@ export function MainHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.left}>
-        <h1 className={styles.title}>Handoff Take Home</h1>
+        <Link href="/">
+          <h1 className={styles.title}>Handoff Take Home</h1>
+        </Link>
       </div>
       <div className={styles.right}>
         {userInitial && <Avatar>{userInitial}</Avatar>}

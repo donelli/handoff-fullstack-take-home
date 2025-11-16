@@ -78,7 +78,6 @@ export const typeDefs = gql`
     location: String!
     cost: Float!
     homeownerIds: [Int!]!
-    createdByUserId: Int!
   }
 
   type CreateJobResult {

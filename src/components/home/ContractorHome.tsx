@@ -169,7 +169,7 @@ export const ContractorHome = () => {
         </Button>
       </div>
 
-      <div style={{ height: "calc(100vh - 100px)" }}>
+      <div className={styles.tableContainer}>
         <AgGridReact
           ref={gridRef}
           rowModelType="infinite"

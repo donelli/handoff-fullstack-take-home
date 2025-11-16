@@ -45,4 +45,6 @@ a {
   
   --primary-color: var(--black);
   --primary-foreground-color: var(--white);
+
+  --main-header-height: 50px;
 }

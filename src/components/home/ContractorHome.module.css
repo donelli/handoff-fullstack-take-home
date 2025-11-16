@@ -1,7 +1,5 @@
 .main {
-    padding: var(--spacing-lg);
-    background-color: var(--gray-100);
-    min-height: 100vh;
+    padding: var(--spacing-md);
 }
 
 .header {
@@ -13,4 +11,8 @@
 
 .headerTitle {
     margin: 0;
+}
+
+.tableContainer {
+    height: calc(100vh - var(--main-header-height) - 100px);
 }

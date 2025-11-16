@@ -8,7 +8,7 @@ import type {
 import type { UsersService } from "../service/users/users.service";
 import type { RequestContext } from "../request_context";
 import { buildDataLoaders } from "./dataloaders";
-import type { JobModel } from "~/models/job";
+import type { JobModel, JobStatus } from "~/models/job";
 
 export type ResolverDependencies = {
   authService: AuthService;
@@ -120,6 +120,15 @@ export function buildResolvers(dependencies: ResolverDependencies) {
             id,
             context,
           });
+        });
+      },
+      changeJobStatus: (
+        _: unknown,
+        { id, status }: { id: number; status: JobStatus },
+        context: RequestContext,
+      ) => {
+        return adaptServiceCall(() => {
+          return jobsService.changeStatus({ id, status, context });
         });
       },
     },

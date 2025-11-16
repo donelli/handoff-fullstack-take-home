@@ -36,6 +36,7 @@ export type UpdateJobPayload = {
   location?: string;
   cost?: number;
   homeownerIds?: number[];
+  status?: JobStatus;
 };
 
 type DeleteJobPayload = {
@@ -112,7 +113,14 @@ export class JobsRepository {
   }
 
   async update(payload: UpdateJobPayload) {
-    const { cost, description, location, homeownerIds, id: jobId } = payload;
+    const {
+      cost,
+      description,
+      location,
+      homeownerIds,
+      id: jobId,
+      status,
+    } = payload;
     const result = await this.db.job.update({
       where: {
         id: jobId,
@@ -122,6 +130,7 @@ export class JobsRepository {
         description,
         location,
         updatedAt: new Date(),
+        status,
         homeowners: homeownerIds?.length
           ? {
               connect: homeownerIds.map((id) => ({ id })),

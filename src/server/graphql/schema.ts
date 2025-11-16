@@ -95,10 +95,15 @@ export const typeDefs = gql`
     data: Job
   }
 
+  type ChangeJobStatusResult {
+    data: Job!
+  }
+
   type Mutation {
     login(input: LoginInput!): LoginResult!
     createJob(input: CreateJobInput!): CreateJobResult!
     updateJob(id: Int!, input: UpdateJobInput!): UpdateJobResult!
     deleteJob(id: Int!): Boolean!
+    changeJobStatus(id: Int!, status: JobStatus!): ChangeJobStatusResult!
   }
 `;

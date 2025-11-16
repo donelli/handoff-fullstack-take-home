@@ -1,3 +1,4 @@
+import type { JobStatus } from "~/models/job";
 import { UserType } from "~/models/user";
 import { ProtectedRouteError } from "~/server/error/protected_route_error";
 import type {
@@ -32,6 +33,12 @@ export type DeleteJobPayload = {
 
 type LoadJobByIdPayload = {
   id: number;
+  context: RequestContext;
+};
+
+export type ChangeJobStatusPayload = {
+  id: number;
+  status: JobStatus;
   context: RequestContext;
 };
 
@@ -165,5 +172,29 @@ export class JobsService {
     });
 
     return true;
+  }
+
+  async changeStatus(payload: ChangeJobStatusPayload) {
+    const { context, id, status } = payload;
+
+    if (!context.userData) {
+      throw new ProtectedRouteError();
+    }
+
+    if (context.userData.type !== UserType.CONTRACTOR) {
+      throw new Error("Only contractors can change job status");
+    }
+
+    const job = await this.loadById({ id, context });
+    if (!job) {
+      throw new Error("Job not found");
+    }
+
+    const updatedJob = await this.jobsRepository.update({
+      id,
+      status,
+    });
+
+    return { data: updatedJob };
   }
 }

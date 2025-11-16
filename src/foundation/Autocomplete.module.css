@@ -1,0 +1,98 @@
+.autocompleteContainer {
+  display: flex;
+  gap: var(--spacing-xs);
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  position: relative;
+  flex-wrap: wrap;
+  min-height: 32px;
+}
+
+.autocompleteContainerWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.autocompleteContainer input {
+  border: none;
+  outline: none;
+  flex: 1;
+}
+
+.autocompleteOption {
+  padding: 2px 0 2px var(--spacing-sm);
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--border-radius-sm);
+  background-color: var(--white);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.autocompleteDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--white);
+  max-height: 300px;
+  overflow-y: scroll;
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--border-radius-sm);
+  z-index: 100;
+}
+
+.autocompleteDropdownOption {
+  cursor: pointer;
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.autocompleteDropdownOption:not(:last-child) {
+  border-bottom: 1px solid var(--card-border-color);
+}
+
+.autocompleteDropdownOptionSelected {
+  background-color: #f5f9ff;
+}
+
+.autocompleteDropdownOptionSelected::after {
+  content: " ✓";
+  margin-left: auto;
+  margin-right: var(--spacing-sm);
+  color: var(--primary-color);
+}
+
+.autocompleteDropdownOptionSublabel {
+  font-size: var(--font-size-xs);
+  color: var(--font-color-secondary);
+}
+
+.autocompleteOptionRemoveButton {
+  width: 25px;
+  height: 25px;
+  background-color: transparent !important;
+  border: none;
+  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 2px;
+  color: var(--font-color-secondary) !important;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+}
+
+.autocompleteOptionRemoveButton:hover {
+  background-color: var(--gray-200) !important;
+}
+
+.autocompleteDropdownOptionActive {
+  background-color: var(--gray-100);
+}
+

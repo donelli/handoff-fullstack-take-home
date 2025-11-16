@@ -31,6 +31,10 @@ a {
   --font-size-xs: 13px;
   --font-size-sm: 14px;
 
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+
   --gray-100: #f7f7f7;
   --gray-200: #e6e6e6;
   --gray-700: #374151;
@@ -48,4 +52,7 @@ a {
   --primary-foreground-color: var(--white);
 
   --main-header-height: 50px;
+
+  --font-color-primary: var(--black);
+  --font-color-secondary: var(--gray-700);
 }

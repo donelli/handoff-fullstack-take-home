@@ -10,6 +10,8 @@ import { useUserContext } from "~/hooks/useUserContext";
 import { type JobStatus } from "~/models/job";
 import { Spinner } from "~/foundation/spinner";
 import { useToast } from "~/foundation/hooks/useToast";
+import { type User } from "~/models/user";
+import { HomeownersList } from "~/components/shared/HomeownersList";
 
 const JOB_QUERY = gql`
   query GetJob($id: Int!) {
@@ -22,6 +24,10 @@ const JOB_QUERY = gql`
       createdAt
       updatedAt
       createdByUser {
+        id
+        name
+      }
+      homeowners {
         id
         name
       }
@@ -38,10 +44,8 @@ type JobQueryResponse = {
     status: JobStatus;
     createdAt: string;
     updatedAt: string;
-    createdByUser: {
-      id: number;
-      name: string;
-    };
+    createdByUser: User;
+    homeowners: User[];
   } | null;
 };
 
@@ -140,9 +144,19 @@ export default function JobDetailsPage() {
 
           <InfoField label="Cost" value={formatCurrency(job.cost)} />
 
+          {job.homeowners && job.homeowners.length > 0 && (
+            <InfoField
+              label="Homeowners"
+              value={<HomeownersList homeowners={job.homeowners} />}
+            />
+          )}
+
           <InfoField label="Updated At" value={formatDate(job.updatedAt)} />
 
-          <InfoField label="Created By" value={job.createdByUser.name} />
+          <InfoField
+            label="Created By"
+            value={<HomeownersList homeowners={[job.createdByUser]} />}
+          />
 
           <InfoField label="Created At" value={formatDate(job.createdAt)} />
         </div>

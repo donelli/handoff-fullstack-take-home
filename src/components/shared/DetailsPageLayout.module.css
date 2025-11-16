@@ -12,8 +12,8 @@
 .header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
   border-bottom: var(--border-size-sm) solid var(--card-border-color);
 }
 
@@ -43,7 +43,6 @@
 
 .body {
   flex: 1;
-  overflow-y: auto;
   padding: var(--spacing-lg);
 }
 

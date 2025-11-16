@@ -9,6 +9,12 @@ import { gql } from "graphql-tag";
 import { useMutation } from "@apollo/client";
 import { useToast } from "~/foundation/hooks/useToast";
 import { useRouter } from "next/navigation";
+import {
+  Autocomplete,
+  type AutocompleteOption,
+} from "~/foundation/autocomplete";
+import { useUsers } from "~/hooks/useUsers";
+import type { User } from "~/models/user";
 
 const QUERY = gql`
   mutation CreateJob($input: CreateJobInput!) {
@@ -34,6 +40,10 @@ export default function CreateJobPage() {
   const [cost, setCost] = useState<number | "">("");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const { homeowners, loading: isLoadingUsers } = useUsers();
+  const [selectedHomeowners, setSelectedHomeowners] = useState<
+    AutocompleteOption<User>[]
+  >([]);
 
   const [createJob, { loading }] =
     useMutation<CreateJobMutationResponse>(QUERY);
@@ -42,9 +52,11 @@ export default function CreateJobPage() {
   const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    const homeownerIds = selectedHomeowners.map((homeowner) => homeowner.id);
+
     const result = await createJob({
       variables: {
-        input: { description, location, cost, homeownerIds: [2] },
+        input: { description, location, cost, homeownerIds },
       },
     });
 
@@ -93,6 +105,22 @@ export default function CreateJobPage() {
           step={0.01}
           required
           readonly={loading}
+        />
+
+        <Autocomplete
+          options={homeowners.map((homeowner) => ({
+            id: homeowner.id,
+            label: homeowner.name,
+            data: homeowner,
+          }))}
+          selectedOptions={selectedHomeowners}
+          onChange={(selected) => {
+            setSelectedHomeowners(selected);
+          }}
+          placeholder="Select homeowners"
+          label="Homeowners"
+          disabled={loading || isLoadingUsers}
+          loading={isLoadingUsers}
         />
       </form>
     </DetailsPageLayout>

@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useAuth } from "~/providers/auth-provider";
-import { MainHeader } from "~/foundation/main-header";
+import { MainHeader } from "~/foundation/MainHeader";
 
 export function ConditionalHeader() {
   const { isAuthenticated, ready } = useAuth();

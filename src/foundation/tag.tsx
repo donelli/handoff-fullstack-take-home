@@ -1,4 +1,4 @@
-import styles from "./index.module.css";
+import styles from "./Tag.module.css";
 
 type TagProps = {
   children: React.ReactNode;

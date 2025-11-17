@@ -1,4 +1,4 @@
-import styles from "./index.module.css";
+import styles from "./InfoField.module.css";
 
 type InfoFieldProps = {
   label: string;
@@ -20,3 +20,4 @@ export function InfoField(props: InfoFieldProps) {
     </div>
   );
 }
+

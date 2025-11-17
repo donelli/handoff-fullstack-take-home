@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "~/foundation/button";
+import { Button } from "~/foundation/Button";
 import styles from "./ConfirmationDialog.module.css";
 
 type ConfirmationDialogProps = {

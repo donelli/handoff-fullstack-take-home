@@ -9,7 +9,7 @@ import {
   type JobFormData,
 } from "~/components/shared/JobForm";
 import { useQuery, useMutation, gql } from "@apollo/client";
-import { Spinner } from "~/foundation/spinner";
+import { Spinner } from "~/foundation/Spinner";
 import { useToast } from "~/foundation/hooks/useToast";
 import type { User } from "~/models/user";
 

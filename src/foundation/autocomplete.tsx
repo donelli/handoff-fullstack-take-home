@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MdClose } from "react-icons/md";
 import styles from "./Autocomplete.module.css";
-import { Avatar } from "./avatar";
-import { Spinner } from "./spinner";
+import { Avatar } from "./Avatar";
+import { Spinner } from "./Spinner";
 
 export interface AutocompleteOption<T> {
   id: number;

@@ -1,21 +1,21 @@
-import styles from "./index.module.css";
+import styles from "./TextBox.module.css";
 
-type TextAreaProps = {
+type TextBoxProps = {
+  type?: HTMLInputElement["type"];
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
   label?: string;
-  rows?: number;
   required?: boolean;
   readonly?: boolean;
 };
 
-export function TextArea(props: TextAreaProps) {
+export function TextBox(props: TextBoxProps) {
   const {
+    type = "text",
     placeholder = "",
     value,
     onChange,
-    rows = 4,
     required,
     readonly,
   } = props;
@@ -25,11 +25,11 @@ export function TextArea(props: TextAreaProps) {
       {props.label && (
         <label className={styles.textBoxLabel}>{props.label}</label>
       )}
-      <textarea
+      <input
+        type={type}
         className={styles.textBox}
         placeholder={placeholder}
         value={value}
-        rows={rows}
         onChange={(e) => onChange(e.target.value)}
         required={required}
         readOnly={readonly}
@@ -37,3 +37,4 @@ export function TextArea(props: TextAreaProps) {
     </div>
   );
 }
+

@@ -2,18 +2,18 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
-import { InfoField } from "~/foundation/info-field";
+import { InfoField } from "~/foundation/InfoField";
 import { Chat } from "~/components/shared/Chat";
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { useUserContext } from "~/hooks/useUserContext";
 import { JobStatus } from "~/models/job";
-import { Spinner } from "~/foundation/spinner";
+import { Spinner } from "~/foundation/Spinner";
 import { useToast } from "~/foundation/hooks/useToast";
 import { type User } from "~/models/user";
 import { HomeownersList } from "~/components/shared/HomeownersList";
 import { StatusToggle } from "~/foundation/StatusToggle";
 import { ConfirmationDialog } from "~/foundation/ConfirmationDialog";
-import { Button } from "~/foundation/button";
+import { Button } from "~/foundation/Button";
 import { useState } from "react";
 import {
   MdCheckCircleOutline,

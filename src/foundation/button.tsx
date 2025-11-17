@@ -1,5 +1,5 @@
-import styles from "./index.module.css";
-import { Spinner } from "./spinner";
+import styles from "./Button.module.css";
+import { Spinner } from "./Spinner";
 
 type ButtonProps = {
   children: React.ReactNode;
@@ -35,3 +35,4 @@ export function Button(props: ButtonProps) {
     </button>
   );
 }
+

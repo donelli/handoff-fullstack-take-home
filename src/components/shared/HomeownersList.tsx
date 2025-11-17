@@ -1,4 +1,4 @@
-import { Avatar } from "~/foundation/avatar";
+import { Avatar } from "~/foundation/Avatar";
 import { type User } from "~/models/user";
 import styles from "./HomeownersList.module.css";
 

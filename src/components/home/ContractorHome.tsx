@@ -11,7 +11,7 @@ import {
 import { useApolloClient, gql } from "@apollo/client";
 import Link from "next/link";
 import styles from "./ContractorHome.module.css";
-import { Button } from "~/foundation/button";
+import { Button } from "~/foundation/Button";
 import { type JobStatus } from "~/models/job";
 import { useRouter } from "next/navigation";
 import { JobStatusBadge } from "../shared/JobStatusBadge";

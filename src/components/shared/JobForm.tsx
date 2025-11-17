@@ -7,13 +7,13 @@ import {
   forwardRef,
   useImperativeHandle,
 } from "react";
-import { TextArea } from "~/foundation/text-area";
-import { TextBox } from "~/foundation/text-box";
-import { NumberInput } from "~/foundation/number-input";
+import { TextArea } from "~/foundation/TextArea";
+import { TextBox } from "~/foundation/TextBox";
+import { NumberInput } from "~/foundation/NumberInput";
 import {
   Autocomplete,
   type AutocompleteOption,
-} from "~/foundation/autocomplete";
+} from "~/foundation/Autocomplete";
 import { useUsers } from "~/hooks/useUsers";
 import type { User } from "~/models/user";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./StatusToggle.module.css";
-import { Spinner } from "./spinner";
+import { Spinner } from "./Spinner";
 
 type StatusToggleProps<T extends string> = {
   value: T;

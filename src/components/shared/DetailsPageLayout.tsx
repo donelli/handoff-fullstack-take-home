@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import styles from "./DetailsPageLayout.module.css";
-import { Button } from "~/foundation/button";
+import { Button } from "~/foundation/Button";
 import { MdChevronLeft } from "react-icons/md";
 
 type DetailsPageLayoutProps = {

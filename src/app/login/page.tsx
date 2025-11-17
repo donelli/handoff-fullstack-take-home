@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import styles from "./index.module.css";
-import { Button } from "~/foundation/button";
-import { TextBox } from "~/foundation/text-box";
+import { Button } from "~/foundation/Button";
+import { TextBox } from "~/foundation/TextBox";
 import { useDoLogin } from "~/hooks/useDoLogin";
 import { useRouter } from "next/navigation";
 import { useToast } from "~/foundation/hooks/useToast";

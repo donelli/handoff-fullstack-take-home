@@ -1,4 +1,4 @@
-import styles from "./spinner.module.css";
+import styles from "./Spinner.module.css";
 
 type SpinnerProps = {
   size?: number;
@@ -18,4 +18,3 @@ export function Spinner({ size = 16, color }: SpinnerProps) {
     />
   );
 }
-

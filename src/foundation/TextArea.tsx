@@ -1,25 +1,21 @@
-import styles from "./index.module.css";
+import styles from "./TextBox.module.css";
 
-type NumberInputProps = {
+type TextAreaProps = {
   placeholder?: string;
-  value: number | "";
-  onChange: (value: number | "") => void;
+  value: string;
+  onChange: (value: string) => void;
   label?: string;
-  min?: number;
-  max?: number;
-  step?: number;
+  rows?: number;
   required?: boolean;
   readonly?: boolean;
 };
 
-export function NumberInput(props: NumberInputProps) {
+export function TextArea(props: TextAreaProps) {
   const {
     placeholder = "",
     value,
     onChange,
-    min,
-    max,
-    step,
+    rows = 4,
     required,
     readonly,
   } = props;
@@ -29,21 +25,16 @@ export function NumberInput(props: NumberInputProps) {
       {props.label && (
         <label className={styles.textBoxLabel}>{props.label}</label>
       )}
-      <input
-        type="number"
+      <textarea
         className={styles.textBox}
         placeholder={placeholder}
         value={value}
-        min={min}
-        max={max}
-        step={step}
-        onChange={(e) => {
-          const val = e.target.value;
-          onChange(val === "" ? "" : Number(val));
-        }}
+        rows={rows}
+        onChange={(e) => onChange(e.target.value)}
         required={required}
         readOnly={readonly}
       />
     </div>
   );
 }
+

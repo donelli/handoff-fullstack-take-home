@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useAuth } from "~/providers/auth-provider";
-import { Avatar } from "./avatar";
-import styles from "./main-header.module.css";
+import { Avatar } from "./Avatar";
+import styles from "./MainHeader.module.css";
 import { MdLogout } from "react-icons/md";
 
 export function MainHeader() {
@@ -35,3 +35,4 @@ export function MainHeader() {
     </header>
   );
 }
+

@@ -73,3 +73,12 @@
     flex: 0 0 100%;
   }
 }
+
+.sideBySideFields {
+  display: flex;
+  gap: var(--spacing-md);
+
+  > * {
+    flex: 1 1 50%;
+  }
+}

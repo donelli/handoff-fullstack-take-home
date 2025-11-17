@@ -32,8 +32,8 @@ model User {
 }
 
 enum JobStatus {
-    PLANNING
     IN_PROGRESS
+    PLANNING
     COMPLETED
     CANCELED
 }
@@ -44,6 +44,8 @@ model Job {
     location    String
     status      JobStatus
     cost        Float
+    startDate   DateTime?
+    endDate     DateTime?
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
@@ -58,6 +60,12 @@ model Job {
     deletedBy       User?     @relation("JobDeletedBy", fields: [deletedByUserId], references: [id])
 
     messages JobChatMessage[]
+
+    @@index([createdByUserId, status])
+    @@index([createdByUserId, startDate])
+    @@index([createdByUserId, endDate])
+    @@index([createdByUserId, createdAt])
+    @@index([createdByUserId, updatedAt])
 }
 
 model JobChatMessage {

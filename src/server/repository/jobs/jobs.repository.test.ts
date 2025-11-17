@@ -29,6 +29,8 @@ describe("JobsRepository", () => {
           updatedAt: new Date("2024-01-01"),
           deletedAt: null,
           deletedByUserId: null,
+          startDate: null,
+          endDate: null,
         },
         {
           id: 2,
@@ -41,6 +43,8 @@ describe("JobsRepository", () => {
           updatedAt: new Date("2024-01-02"),
           deletedAt: null,
           deletedByUserId: null,
+          startDate: null,
+          endDate: null,
         },
       ];
 
@@ -50,6 +54,8 @@ describe("JobsRepository", () => {
       const result = await repository.load({
         limit: 10,
         page: 1,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
 
       expect(mockDb.job.findMany).toHaveBeenCalledWith({
@@ -107,6 +113,8 @@ describe("JobsRepository", () => {
           updatedAt: new Date("2024-01-01"),
           deletedAt: null,
           deletedByUserId: null,
+          startDate: null,
+          endDate: null,
         },
       ];
 
@@ -117,6 +125,8 @@ describe("JobsRepository", () => {
         limit: 10,
         page: 1,
         homeownerId: 5,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
 
       expect(mockDb.job.findMany).toHaveBeenCalledWith({
@@ -148,6 +158,8 @@ describe("JobsRepository", () => {
         limit: 10,
         page: 1,
         createdByUserId: 3,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
 
       expect(mockDb.job.findMany).toHaveBeenCalledWith({
@@ -175,6 +187,8 @@ describe("JobsRepository", () => {
         limit: 10,
         page: 1,
         status: [JobStatus.PLANNING, JobStatus.IN_PROGRESS],
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
 
       expect(mockDb.job.findMany).toHaveBeenCalledWith({
@@ -201,6 +215,8 @@ describe("JobsRepository", () => {
       await repository.load({
         limit: 10,
         page: 3,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
 
       expect(mockDb.job.findMany).toHaveBeenCalledWith({
@@ -224,10 +240,112 @@ describe("JobsRepository", () => {
       const result = await repository.load({
         limit: 10,
         page: 1,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
 
       expect(result.data).toEqual([]);
       expect(result.total).toBe(0);
+    });
+
+    it("should sort by START_DATE in ascending order", async () => {
+      mockDb.job.findMany.mockResolvedValue([]);
+      mockDb.job.count.mockResolvedValue(0);
+
+      await repository.load({
+        limit: 10,
+        page: 1,
+        sortField: "START_DATE",
+        sortDirection: "ASC",
+      });
+
+      expect(mockDb.job.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        where: {
+          deletedAt: {
+            equals: null,
+          },
+        },
+        orderBy: {
+          startDate: "asc",
+        },
+      });
+    });
+
+    it("should sort by END_DATE in descending order", async () => {
+      mockDb.job.findMany.mockResolvedValue([]);
+      mockDb.job.count.mockResolvedValue(0);
+
+      await repository.load({
+        limit: 10,
+        page: 1,
+        sortField: "END_DATE",
+        sortDirection: "DESC",
+      });
+
+      expect(mockDb.job.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        where: {
+          deletedAt: {
+            equals: null,
+          },
+        },
+        orderBy: {
+          endDate: "desc",
+        },
+      });
+    });
+
+    it("should sort by UPDATED_AT in ascending order", async () => {
+      mockDb.job.findMany.mockResolvedValue([]);
+      mockDb.job.count.mockResolvedValue(0);
+
+      await repository.load({
+        limit: 10,
+        page: 1,
+        sortField: "UPDATED_AT",
+        sortDirection: "ASC",
+      });
+
+      expect(mockDb.job.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        where: {
+          deletedAt: {
+            equals: null,
+          },
+        },
+        orderBy: {
+          updatedAt: "asc",
+        },
+      });
+    });
+
+    it("should sort by STATUS in descending order", async () => {
+      mockDb.job.findMany.mockResolvedValue([]);
+      mockDb.job.count.mockResolvedValue(0);
+
+      await repository.load({
+        limit: 10,
+        page: 1,
+        sortField: "STATUS",
+        sortDirection: "DESC",
+      });
+
+      expect(mockDb.job.findMany).toHaveBeenCalledWith({
+        skip: 0,
+        take: 10,
+        where: {
+          deletedAt: {
+            equals: null,
+          },
+        },
+        orderBy: {
+          status: "desc",
+        },
+      });
     });
   });
 
@@ -244,6 +362,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.create.mockResolvedValue(prismaJob);
@@ -266,6 +386,8 @@ describe("JobsRepository", () => {
           homeowners: {
             connect: [{ id: 2 }, { id: 3 }],
           },
+          startDate: undefined,
+          endDate: undefined,
         },
       });
       expect(result).toEqual(
@@ -292,6 +414,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.create.mockResolvedValue(prismaJob);
@@ -314,8 +438,64 @@ describe("JobsRepository", () => {
           homeowners: {
             connect: [],
           },
+          startDate: undefined,
+          endDate: undefined,
         },
       });
+    });
+
+    it("should create a job with startDate and endDate", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-01"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: new Date("2024-02-01"),
+        endDate: new Date("2024-02-15"),
+      };
+
+      mockDb.job.create.mockResolvedValue(prismaJob);
+
+      const result = await repository.create({
+        description: "Fix roof",
+        location: "123 Main St",
+        cost: 5000,
+        homeownerIds: [2],
+        createdByUserId: 1,
+        startDate: "2024-02-01T00:00:00.000Z",
+        endDate: "2024-02-15T00:00:00.000Z",
+      });
+
+      expect(mockDb.job.create).toHaveBeenCalledWith({
+        data: {
+          cost: 5000,
+          description: "Fix roof",
+          location: "123 Main St",
+          createdByUserId: 1,
+          status: "PLANNING",
+          homeowners: {
+            connect: [{ id: 2 }],
+          },
+          startDate: "2024-02-01T00:00:00.000Z",
+          endDate: "2024-02-15T00:00:00.000Z",
+        },
+      });
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: 1,
+          description: "Fix roof",
+          location: "123 Main St",
+          status: JobStatus.PLANNING,
+          cost: 5000,
+          createdByUserId: 1,
+        }),
+      );
     });
   });
 
@@ -332,6 +512,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-02"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.update.mockResolvedValue(prismaJob);
@@ -358,6 +540,8 @@ describe("JobsRepository", () => {
           homeowners: {
             set: [{ id: 2 }, { id: 4 }],
           },
+          startDate: undefined,
+          endDate: undefined,
         },
       });
       expect(result).toEqual(
@@ -383,6 +567,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-02"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.update.mockResolvedValue(prismaJob);
@@ -401,6 +587,8 @@ describe("JobsRepository", () => {
           updatedAt: expect.any(Date) as unknown,
           status: undefined,
           homeowners: undefined,
+          startDate: undefined,
+          endDate: undefined,
         },
       });
     });
@@ -417,6 +605,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-02"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.update.mockResolvedValue(prismaJob);
@@ -433,6 +623,82 @@ describe("JobsRepository", () => {
         (updateCall?.[0]?.data as { homeowners?: unknown }).homeowners,
       ).toBeUndefined();
     });
+
+    it("should update job with startDate and endDate", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: new Date("2024-02-01"),
+        endDate: new Date("2024-02-15"),
+      };
+
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        startDate: "2024-02-01T00:00:00.000Z",
+        endDate: "2024-02-15T00:00:00.000Z",
+      });
+
+      expect(mockDb.job.update).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+        },
+        data: {
+          updatedAt: expect.any(Date) as unknown,
+          status: undefined,
+          homeowners: undefined,
+          startDate: "2024-02-01T00:00:00.000Z",
+          endDate: "2024-02-15T00:00:00.000Z",
+        },
+      });
+    });
+
+    it("should update job with null startDate and endDate", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        startDate: null,
+        endDate: null,
+      });
+
+      expect(mockDb.job.update).toHaveBeenCalledWith({
+        where: {
+          id: 1,
+        },
+        data: {
+          updatedAt: expect.any(Date) as unknown,
+          status: undefined,
+          homeowners: undefined,
+          startDate: null,
+          endDate: null,
+        },
+      });
+    });
   });
 
   describe("loadById", () => {
@@ -448,6 +714,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.findFirst.mockResolvedValue(prismaJob);
@@ -496,6 +764,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.findFirst.mockResolvedValue(prismaJob);
@@ -556,6 +826,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01"),
         deletedAt: new Date("2024-01-02"),
         deletedByUserId: 1,
+        startDate: null,
+        endDate: null,
       };
 
       mockDb.job.update.mockResolvedValue(prismaJob);
@@ -588,6 +860,8 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01T00:00:00Z"),
         deletedAt: null,
         deletedByUserId: null,
+        startDate: null,
+        endDate: null,
       };
 
       const result = repository.mapJobToDomain(prismaJob);
@@ -603,6 +877,8 @@ describe("JobsRepository", () => {
         updatedAt: "2024-01-01T00:00:00.000Z",
         deletedAt: undefined,
         deletedByUserId: null,
+        startDate: undefined,
+        endDate: undefined,
       });
     });
 
@@ -618,12 +894,36 @@ describe("JobsRepository", () => {
         updatedAt: new Date("2024-01-01T00:00:00Z"),
         deletedAt: new Date("2024-01-02T00:00:00Z"),
         deletedByUserId: 1,
+        startDate: null,
+        endDate: null,
       };
 
       const result = repository.mapJobToDomain(prismaJob);
 
       expect(result.deletedAt).toBe("2024-01-02T00:00:00.000Z");
       expect(result.deletedByUserId).toBe(1);
+    });
+
+    it("should map startDate and endDate correctly", () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01T00:00:00Z"),
+        updatedAt: new Date("2024-01-01T00:00:00Z"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: new Date("2024-02-01T00:00:00Z"),
+        endDate: new Date("2024-02-15T00:00:00Z"),
+      };
+
+      const result = repository.mapJobToDomain(prismaJob);
+
+      expect(result.startDate).toBe("2024-02-01T00:00:00.000Z");
+      expect(result.endDate).toBe("2024-02-15T00:00:00.000Z");
     });
   });
 

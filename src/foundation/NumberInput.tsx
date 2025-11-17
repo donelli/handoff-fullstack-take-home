@@ -10,6 +10,7 @@ type NumberInputProps = {
   step?: number;
   required?: boolean;
   readonly?: boolean;
+  prefix?: string;
 };
 
 export function NumberInput(props: NumberInputProps) {
@@ -22,6 +23,7 @@ export function NumberInput(props: NumberInputProps) {
     step,
     required,
     readonly,
+    prefix,
   } = props;
 
   return (
@@ -29,22 +31,24 @@ export function NumberInput(props: NumberInputProps) {
       {props.label && (
         <label className={styles.textBoxLabel}>{props.label}</label>
       )}
-      <input
-        type="number"
-        className={styles.textBox}
-        placeholder={placeholder}
-        value={value}
-        min={min}
-        max={max}
-        step={step}
-        onChange={(e) => {
-          const val = e.target.value;
-          onChange(val === "" ? "" : Number(val));
-        }}
-        required={required}
-        readOnly={readonly}
-      />
+      <div className={styles.textBoxInputContainer}>
+        {prefix && <span className={styles.textBoxPrefix}>{prefix}</span>}
+        <input
+          type="number"
+          className={styles.textBox}
+          placeholder={placeholder}
+          value={value}
+          min={min}
+          max={max}
+          step={step}
+          onChange={(e) => {
+            const val = e.target.value;
+            onChange(val === "" ? "" : Number(val));
+          }}
+          required={required}
+          readOnly={readonly}
+        />
+      </div>
     </div>
   );
 }
-

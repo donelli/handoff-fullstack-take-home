@@ -119,6 +119,7 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
           step={0.01}
           required
           readonly={isFormDisabled}
+          prefix="$"
         />
 
         <Autocomplete

@@ -17,3 +17,24 @@
     margin-bottom: var(--spacing-md);
 }
 
+.textBoxInputContainer {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--card-border-color);
+    border-radius: var(--border-sm);
+    overflow: hidden;
+}
+
+.textBoxInputContainer .textBox {
+    border: none;
+    border-radius: 0;
+    flex: 1;
+}
+
+.textBoxPrefix {
+    padding: var(--spacing-sm);
+    background-color: var(--gray-200);
+    color: var(--text-color);
+    font-family: inherit;
+    border-right: 1px solid var(--card-border-color);
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
+import { DetailsPageLayout } from "~/foundation/DetailsPageLayout";
 import { InfoField } from "~/foundation/InfoField";
 import { JobChat } from "~/components/shared/JobChat";
 import { useUserContext } from "~/hooks/useUserContext";

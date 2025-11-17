@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
+import { DetailsPageLayout } from "~/foundation/DetailsPageLayout";
 import {
   JobForm,
   type JobFormRef,

@@ -48,7 +48,7 @@ export class JobsService {
 
   async loadBasedOnUser(payload: LoadJobsPayload) {
     const { context, status } = payload;
-    const limit = payload.limit ?? 20;
+    let limit = payload.limit ?? 20;
     const page = payload.page ?? 1;
 
     if (limit > 200) {

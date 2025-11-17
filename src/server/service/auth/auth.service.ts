@@ -10,6 +10,7 @@ import type {
   RequestContextUserData,
 } from "~/server/request_context";
 import { ProtectedRouteError } from "~/server/error/protected_route_error";
+import { logger } from "~/server/logger";
 
 type LoginPayload = {
   username: string;
@@ -106,7 +107,7 @@ export class AuthService {
         type: decodedJwt.userType as UserType,
       };
     } catch (error) {
-      console.error("Error parsing and validating token", error);
+      logger.error("Error parsing and validating token", error);
       return undefined;
     }
   }

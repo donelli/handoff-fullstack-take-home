@@ -48,6 +48,13 @@ export const ContractorHome = () => {
             const result = await loadJobs(apolloClient, { page, limit });
 
             params.successCallback(result.jobs, result.pagination.total);
+
+            // Show no rows overlay if there are no jobs
+            if (result.pagination.total === 0 && gridRef.current?.api) {
+              gridRef.current.api.showNoRowsOverlay();
+            } else if (result.pagination.total > 0 && gridRef.current?.api) {
+              gridRef.current.api.hideOverlay();
+            }
           } catch {
             params.failCallback();
           }
@@ -150,9 +157,9 @@ export const ContractorHome = () => {
           infiniteInitialRowCount={1}
           onGridReady={onGridReady}
           onPaginationChanged={onPaginationChanged}
+          overlayNoRowsTemplate="<span>No jobs found</span>"
         />
       </div>
     </main>
   );
 };
-

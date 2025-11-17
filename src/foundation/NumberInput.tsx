@@ -43,7 +43,14 @@ export function NumberInput(props: NumberInputProps) {
           step={step}
           onChange={(e) => {
             const val = e.target.value;
-            onChange(val === "" ? "" : Number(val));
+            if (val === "") {
+              onChange("");
+            } else {
+              const numValue = Number(val);
+              // Round to 2 decimal places
+              const rounded = Math.round(numValue * 100) / 100;
+              onChange(rounded);
+            }
           }}
           required={required}
           readOnly={readonly}

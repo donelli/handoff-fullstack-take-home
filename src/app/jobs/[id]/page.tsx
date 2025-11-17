@@ -21,6 +21,7 @@ import {
   MdOutlineBuildCircle,
   MdOutlineFilterTiltShift,
   MdDeleteOutline,
+  MdModeEdit,
 } from "react-icons/md";
 
 const JOB_QUERY = gql`
@@ -222,14 +223,24 @@ export default function JobDetailsPage() {
       <DetailsPageLayout
         title="Job Details"
         headerAction={
-          <Button
-            onClick={() => setShowDeleteConfirm(true)}
-            type="button"
-            variant="danger"
-          >
-            <MdDeleteOutline size={16} />
-            Delete
-          </Button>
+          <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
+            <Button
+              onClick={() => router.push(`/jobs/${jobId}/edit`)}
+              type="button"
+              variant="primary"
+            >
+              <MdModeEdit size={16} />
+              Edit
+            </Button>
+            <Button
+              onClick={() => setShowDeleteConfirm(true)}
+              type="button"
+              variant="danger"
+            >
+              <MdDeleteOutline size={16} />
+              Delete
+            </Button>
+          </div>
         }
       >
         <div

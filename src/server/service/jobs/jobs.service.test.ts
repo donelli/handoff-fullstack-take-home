@@ -76,6 +76,8 @@ describe("JobsService", () => {
         createdByUserId: 1,
         homeownerId: undefined,
         status: undefined,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
       expect(jobs).toEqual(result);
     });
@@ -111,6 +113,8 @@ describe("JobsService", () => {
         createdByUserId: undefined,
         homeownerId: 2,
         status: undefined,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
       expect(jobs).toEqual(result);
     });
@@ -137,6 +141,8 @@ describe("JobsService", () => {
         createdByUserId: 1,
         homeownerId: undefined,
         status: undefined,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
       expect(jobs).toEqual(result);
     });
@@ -162,6 +168,8 @@ describe("JobsService", () => {
         createdByUserId: 1,
         homeownerId: undefined,
         status: undefined,
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
       });
     });
 
@@ -186,6 +194,35 @@ describe("JobsService", () => {
         createdByUserId: 1,
         homeownerId: undefined,
         status: [JobStatus.PLANNING, JobStatus.IN_PROGRESS],
+        sortField: "CREATED_AT",
+        sortDirection: "ASC",
+      });
+    });
+
+    it("should use custom sort field and direction", async () => {
+      const result = {
+        page: 1,
+        limit: 20,
+        total: 2,
+        data: [],
+      };
+
+      mockJobsRepository.load.mockResolvedValue(result);
+
+      await service.loadBasedOnUser({
+        context: contractorContext,
+        sortField: "START_DATE",
+        sortDirection: "DESC",
+      });
+
+      expect(mockJobsRepository.load).toHaveBeenCalledWith({
+        limit: 20,
+        page: 1,
+        createdByUserId: 1,
+        homeownerId: undefined,
+        status: undefined,
+        sortField: "START_DATE",
+        sortDirection: "DESC",
       });
     });
 

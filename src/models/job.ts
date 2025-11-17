@@ -16,4 +16,6 @@ export type JobModel = {
   deletedByUserId?: number | null;
   createdAt: string;
   updatedAt: string;
+  startDate?: string | null;
+  endDate?: string | null;
 };

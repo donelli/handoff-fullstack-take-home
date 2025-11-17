@@ -3,6 +3,8 @@ import { UserType } from "~/models/user";
 import { ProtectedRouteError } from "~/server/error/protected_route_error";
 import type {
   JobsRepository,
+  LoadJobsSortDirection,
+  LoadJobsSortField,
   CreateJobPayload as RepositoryCreateJobPayload,
   UpdateJobPayload as RepositoryUpdateJobPayload,
 } from "~/server/repository/jobs/jobs.repository";
@@ -12,6 +14,8 @@ type LoadJobsPayload = {
   limit?: number;
   page?: number;
   status?: JobStatus[];
+  sortField?: LoadJobsSortField;
+  sortDirection?: LoadJobsSortDirection;
 
   context: RequestContext;
 };
@@ -50,6 +54,8 @@ export class JobsService {
     const { context, status } = payload;
     let limit = payload.limit ?? 20;
     const page = payload.page ?? 1;
+    const sortField = payload.sortField ?? "CREATED_AT";
+    const sortDirection = payload.sortDirection ?? "ASC";
 
     if (limit > 200) {
       limit = 200;
@@ -74,6 +80,8 @@ export class JobsService {
       createdByUserId,
       homeownerId,
       status,
+      sortField,
+      sortDirection,
     });
 
     return result;

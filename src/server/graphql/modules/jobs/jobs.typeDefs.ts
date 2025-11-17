@@ -8,10 +8,25 @@ export const jobsTypeDefs = gql`
     data: [Job!]!
   }
 
+  enum JobSortField {
+    START_DATE
+    END_DATE
+    STATUS
+    UPDATED_AT
+    CREATED_AT
+  }
+
+  enum JobSortDirection {
+    ASC
+    DESC
+  }
+
   input JobsFilterInput {
     page: Int
     limit: Int
     status: [JobStatus!]
+    sortField: JobSortField
+    sortDirection: JobSortDirection
   }
 
   type Job {
@@ -20,6 +35,8 @@ export const jobsTypeDefs = gql`
     location: String!
     cost: Float!
     status: JobStatus!
+    startDate: String
+    endDate: String
     createdAt: String!
     updatedAt: String!
     createdByUserId: Int!
@@ -42,6 +59,8 @@ export const jobsTypeDefs = gql`
     location: NonEmptyString!
     cost: Float!
     homeownerIds: [Int!]!
+    startDate: String
+    endDate: String
   }
 
   type CreateJobResult {
@@ -53,6 +72,8 @@ export const jobsTypeDefs = gql`
     location: NonEmptyString
     cost: Float
     homeownerIds: [Int!]
+    startDate: String
+    endDate: String
   }
 
   type UpdateJobResult {

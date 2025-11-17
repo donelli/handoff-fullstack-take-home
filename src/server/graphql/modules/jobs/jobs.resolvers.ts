@@ -8,6 +8,10 @@ import { adaptServiceCall } from "../../resolvers";
 import type { JobStatus } from "~/models/job";
 import type { DataLoaders } from "../../dataloaders";
 import type { UsersService } from "~/server/service/users/users.service";
+import type {
+  LoadJobsSortDirection,
+  LoadJobsSortField,
+} from "~/server/repository/jobs/jobs.repository";
 
 export const buildJobsResolvers = ({
   jobsService,
@@ -121,14 +125,16 @@ type LoadJobsFilter = {
   page?: number;
   limit?: number;
   status?: JobStatus[];
+  sortField?: LoadJobsSortField;
+  sortDirection?: LoadJobsSortDirection;
 };
 
 type CreateJobInput = Pick<
   CreateJobPayload,
-  "description" | "cost" | "location" | "homeownerIds"
+  "description" | "cost" | "location" | "homeownerIds" | "startDate" | "endDate"
 >;
 
 type UpdateJobInput = Pick<
   UpdateJobPayload,
-  "description" | "cost" | "location" | "homeownerIds"
+  "description" | "cost" | "location" | "homeownerIds" | "startDate" | "endDate"
 >;

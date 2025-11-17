@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Job" ADD COLUMN "endDate" DATETIME;
+ALTER TABLE "Job" ADD COLUMN "startDate" DATETIME;

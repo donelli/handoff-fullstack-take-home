@@ -7,12 +7,23 @@ import {
 } from "generated/prisma";
 import { JobStatus } from "~/models/job";
 
+export type LoadJobsSortField =
+  | "START_DATE"
+  | "END_DATE"
+  | "UPDATED_AT"
+  | "CREATED_AT"
+  | "STATUS";
+
+export type LoadJobsSortDirection = "ASC" | "DESC";
+
 type LoadJobsPayload = {
   createdByUserId?: number;
   homeownerId?: number;
   limit: number;
   page: number;
   status?: JobStatus[];
+  sortField?: LoadJobsSortField;
+  sortDirection?: LoadJobsSortDirection;
 };
 
 type LoadJobsResult = {
@@ -28,6 +39,8 @@ export type CreateJobPayload = {
   cost: number;
   homeownerIds: number[];
   createdByUserId: number;
+  startDate?: string | null;
+  endDate?: string | null;
 };
 
 export type UpdateJobPayload = {
@@ -38,6 +51,8 @@ export type UpdateJobPayload = {
   cost?: number;
   homeownerIds?: number[];
   status?: JobStatus;
+  startDate?: string | null;
+  endDate?: string | null;
 };
 
 type DeleteJobPayload = {
@@ -49,7 +64,15 @@ export class JobsRepository {
   constructor(private readonly db: DbClient) {}
 
   async load(payload: LoadJobsPayload): Promise<LoadJobsResult> {
-    const { limit, page, homeownerId, createdByUserId, status } = payload;
+    const {
+      limit,
+      page,
+      homeownerId,
+      createdByUserId,
+      status,
+      sortField,
+      sortDirection,
+    } = payload;
 
     const where: Prisma.JobFindManyArgs["where"] = {
       deletedAt: {
@@ -79,14 +102,32 @@ export class JobsRepository {
       };
     }
 
+    let orderBy: Prisma.JobFindManyArgs["orderBy"];
+    const prismaSortDirection = sortDirection === "ASC" ? "asc" : "desc";
+    switch (sortField ?? "CREATED_AT") {
+      case "START_DATE":
+        orderBy = { startDate: prismaSortDirection };
+        break;
+      case "END_DATE":
+        orderBy = { endDate: prismaSortDirection };
+        break;
+      case "UPDATED_AT":
+        orderBy = { updatedAt: prismaSortDirection };
+        break;
+      case "CREATED_AT":
+        orderBy = { createdAt: prismaSortDirection };
+        break;
+      case "STATUS":
+        orderBy = { status: prismaSortDirection };
+        break;
+    }
+
     const [jobs, total] = await Promise.all([
       this.db.job.findMany({
         skip: limit * (page - 1),
         take: limit,
         where,
-        orderBy: {
-          createdAt: "asc",
-        },
+        orderBy,
       }),
       this.db.job.count({ where }),
     ]);
@@ -100,8 +141,15 @@ export class JobsRepository {
   }
 
   async create(payload: CreateJobPayload) {
-    const { cost, description, location, createdByUserId, homeownerIds } =
-      payload;
+    const {
+      cost,
+      description,
+      location,
+      createdByUserId,
+      homeownerIds,
+      startDate,
+      endDate,
+    } = payload;
 
     const result = await this.db.job.create({
       data: {
@@ -113,6 +161,8 @@ export class JobsRepository {
         homeowners: {
           connect: homeownerIds.map((id) => ({ id })),
         },
+        startDate,
+        endDate,
       },
     });
 
@@ -127,6 +177,8 @@ export class JobsRepository {
       homeownerIds,
       id: jobId,
       status,
+      startDate,
+      endDate,
     } = payload;
     const result = await this.db.job.update({
       where: {
@@ -144,6 +196,8 @@ export class JobsRepository {
                 set: homeownerIds.map((id) => ({ id })),
               }
             : undefined,
+        startDate: startDate,
+        endDate: endDate,
       },
     });
 
@@ -200,6 +254,8 @@ export class JobsRepository {
       status: this.mapJobStatusToDomain(job.status),
       createdAt: job.createdAt.toISOString(),
       updatedAt: job.updatedAt.toISOString(),
+      startDate: job.startDate?.toISOString(),
+      endDate: job.endDate?.toISOString(),
     };
   }
 

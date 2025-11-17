@@ -2,8 +2,8 @@
 
 import { useAuth } from "~/providers/auth-provider";
 import { UserType } from "~/models/user";
-import { ContractorHome } from "~/components/home/ContractorHome";
-import { HomeownerHome } from "~/components/home/HomeownerHome";
+import { ContractorHome } from "~/app/home/ContractorHome";
+import { HomeownerHome } from "~/app/home/HomeownerHome";
 
 export default function Home() {
   const { user, ready } = useAuth();

@@ -6,7 +6,7 @@ import Link from "next/link";
 import styles from "./HomeownerHome.module.css";
 import { Button } from "~/foundation/Button";
 import { JobStatus } from "~/models/job";
-import { JobStatusBadge } from "../shared/JobStatusBadge";
+import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
 import { useUserContext } from "~/hooks/useUserContext";
 import { Spinner } from "~/foundation/Spinner";
 import { loadJobs, type JobListItem } from "~/hooks/api";
@@ -189,3 +189,4 @@ export const HomeownerHome = () => {
     </main>
   );
 };
+

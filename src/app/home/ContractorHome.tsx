@@ -14,7 +14,7 @@ import styles from "./ContractorHome.module.css";
 import { Button } from "~/foundation/Button";
 import { type JobStatus } from "~/models/job";
 import { useRouter } from "next/navigation";
-import { JobStatusBadge } from "../shared/JobStatusBadge";
+import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
 import { useUserContext } from "~/hooks/useUserContext";
 import { MdAdd } from "react-icons/md";
 import { loadJobs, type JobListItem } from "~/hooks/api";
@@ -155,3 +155,4 @@ export const ContractorHome = () => {
     </main>
   );
 };
+

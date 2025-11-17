@@ -2,7 +2,6 @@ export { useJobs, loadJobs } from "./useJobs";
 export { useJob } from "./useJob";
 export { useJobForEdit } from "./useJobForEdit";
 export { useJobChatMessages } from "./useJobChatMessages";
-export { useMe } from "./useMe";
 export { useUsers } from "./useUsers";
 export { useLogin } from "./useLogin";
 export { useCreateJob } from "./useCreateJob";

@@ -13,6 +13,7 @@ import type {
   CreateJobChatMessagePayload,
   JobChatMessageService,
 } from "../service/job_chat_message/job_chat_message.service";
+import { NonEmptyStringScalar } from "./scalars";
 
 export type ResolverDependencies = {
   authService: AuthService;
@@ -28,6 +29,7 @@ export function buildResolvers(dependencies: ResolverDependencies) {
   const dataLoaders = buildDataLoaders(dependencies);
 
   return {
+    NonEmptyString: NonEmptyStringScalar,
     Query: {
       me: (_: unknown, __: unknown, context: RequestContext) => {
         return adaptServiceCall(() => authService.loadMe(context));

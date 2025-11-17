@@ -1,6 +1,8 @@
 import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
+  scalar NonEmptyString
+
   type LoadJobsResult {
     page: Int!
     limit: Int!
@@ -48,8 +50,8 @@ export const typeDefs = gql`
   }
 
   input LoginInput {
-    username: String!
-    password: String!
+    username: NonEmptyString!
+    password: NonEmptyString!
   }
 
   type IncorrectUserOrPasswordError {
@@ -75,8 +77,8 @@ export const typeDefs = gql`
   }
 
   input CreateJobInput {
-    description: String!
-    location: String!
+    description: NonEmptyString!
+    location: NonEmptyString!
     cost: Float!
     homeownerIds: [Int!]!
   }
@@ -86,8 +88,8 @@ export const typeDefs = gql`
   }
 
   input UpdateJobInput {
-    description: String
-    location: String
+    description: NonEmptyString
+    location: NonEmptyString
     cost: Float
     homeownerIds: [Int!]
   }
@@ -101,7 +103,7 @@ export const typeDefs = gql`
   }
 
   input CreateJobChatMessageInput {
-    content: String!
+    content: NonEmptyString!
     jobId: Int!
   }
 

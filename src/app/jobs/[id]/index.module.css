@@ -82,3 +82,37 @@
     flex: 1 1 50%;
   }
 }
+
+.taskItem {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.taskItemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.taskItemContent {
+  padding: var(--spacing-sm);
+  padding-bottom: 0;
+}
+
+.taskItemPendingContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  color: var(--gray-500);
+}
+
+.taskItemCompleted {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--gray-500);
+}

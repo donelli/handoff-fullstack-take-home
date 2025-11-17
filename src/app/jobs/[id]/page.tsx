@@ -13,7 +13,7 @@ import { HomeownersList } from "~/components/shared/HomeownersList";
 import { StatusToggle } from "~/foundation/StatusToggle";
 import { ConfirmationDialog } from "~/foundation/ConfirmationDialog";
 import { Button } from "~/foundation/Button";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   MdCheckCircleOutline,
   MdOutlineBlock,
@@ -21,11 +21,18 @@ import {
   MdOutlineFilterTiltShift,
   MdDeleteOutline,
   MdModeEdit,
+  MdPendingActions,
 } from "react-icons/md";
 import { useAuth } from "~/providers/auth-provider";
 import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
 import styles from "./index.module.css";
-import { useJob, useChangeJobStatus, useDeleteJob } from "~/hooks/api";
+import {
+  useJob,
+  useChangeJobStatus,
+  useDeleteJob,
+  useCompleteJobTask,
+} from "~/hooks/api";
+import type { JobTask } from "~/hooks/api/useJob";
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -158,6 +165,10 @@ export default function JobDetailsPage() {
               </div>
             )}
 
+            {job.tasks && job.tasks.length > 0 && (
+              <JobTasksList tasks={job.tasks} onTaskCompleted={refetch} />
+            )}
+
             <div className={styles.sideBySideFields}>
               <InfoField label="Created At" value={formatDate(job.createdAt)} />
 
@@ -273,5 +284,105 @@ const NotFoundPage = () => {
         </p>
       </div>
     </DetailsPageLayout>
+  );
+};
+
+const JobTasksList = ({
+  tasks,
+  onTaskCompleted,
+}: {
+  tasks: JobTask[];
+  onTaskCompleted: () => void;
+}) => {
+  const { formatCurrency, formatDate } = useUserContext();
+  const { showErrorToast, showSuccessToast } = useToast();
+  const { completeJobTask, loading: completeTaskLoading } =
+    useCompleteJobTask();
+  const { user } = useAuth();
+  const isContractor = user?.type === UserType.CONTRACTOR;
+
+  const { completedTasksCount, pendingTasksCount } = useMemo(() => {
+    let completedTasksCount = 0;
+
+    for (const task of tasks) {
+      if (task.completedAt) {
+        completedTasksCount++;
+      }
+    }
+
+    return {
+      completedTasksCount,
+      pendingTasksCount: tasks.length - completedTasksCount,
+    };
+  }, [tasks]);
+
+  const handleCompleteTask = async (taskId: number) => {
+    try {
+      const result = await completeJobTask(taskId);
+      if (result) {
+        showSuccessToast("Task completed successfully");
+        onTaskCompleted();
+      }
+    } catch (err) {
+      console.error(err);
+      showErrorToast("Failed to complete task");
+    }
+  };
+
+  return (
+    <InfoField
+      label={`Tasks (${completedTasksCount} completed, ${pendingTasksCount} pending)`}
+      noBackground
+      value={
+        <div className={styles.tasksList}>
+          {tasks.map((task) => (
+            <div className={styles.taskItem} key={task.id}>
+              <div className={styles.taskItemHeader}>
+                <div>{task.description}</div>
+
+                {task.completedAt ? (
+                  <span className={styles.taskItemCompleted}>
+                    <MdCheckCircleOutline size={14} color="var(--green-500)" />
+                    Completed
+                  </span>
+                ) : (
+                  <div className={styles.taskItemPendingContainer}>
+                    {isContractor ? (
+                      <Button
+                        onClick={() => handleCompleteTask(task.id)}
+                        type="button"
+                        variant="outline"
+                        loading={completeTaskLoading}
+                        size="small"
+                      >
+                        <MdCheckCircleOutline
+                          size={14}
+                          color="var(--green-500)"
+                        />
+                        Complete
+                      </Button>
+                    ) : (
+                      <span className={styles.taskItemPendingContainer}>
+                        <MdPendingActions size={14} color="var(--orange-500)" />
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className={styles.taskItemContent}>
+                <InfoField label="Cost" value={formatCurrency(task.cost)} />
+                {task.completedAt && (
+                  <InfoField
+                    label="Completed At"
+                    value={formatDate(task.completedAt)}
+                  />
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      }
+    />
   );
 };

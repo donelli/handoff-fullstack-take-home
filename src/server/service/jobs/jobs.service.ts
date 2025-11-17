@@ -47,6 +47,16 @@ export type ChangeJobStatusPayload = {
   context: RequestContext;
 };
 
+export type LoadTasksByJobIdPayload = {
+  id: number;
+  context: RequestContext;
+};
+
+export type CompleteJobTaskPayload = {
+  id: number;
+  context: RequestContext;
+};
+
 export class JobsService {
   constructor(private readonly jobsRepository: JobsRepository) {}
 
@@ -210,5 +220,37 @@ export class JobsService {
     });
 
     return { data: updatedJob };
+  }
+
+  async loadTasksByJobId(payload: LoadTasksByJobIdPayload) {
+    const { context, id } = payload;
+
+    if (!context.userData) {
+      throw new ProtectedRouteError();
+    }
+
+    const tasks = await this.jobsRepository.loadTasksByJobId(id);
+
+    return tasks;
+  }
+
+  async completeJobTask(payload: CompleteJobTaskPayload) {
+    const { context, id } = payload;
+
+    if (!context.userData) {
+      throw new ProtectedRouteError();
+    }
+
+    if (context.userData.type !== UserType.CONTRACTOR) {
+      throw new Error("Only contractors can complete job tasks");
+    }
+
+    const task = await this.jobsRepository.updateJobTask({
+      id,
+      completedByUserId: context.userData.id,
+      completedAt: new Date().toISOString(),
+    });
+
+    return { data: task };
   }
 }

@@ -263,6 +263,7 @@ describe("JobsService", () => {
         location: "123 Main St",
         cost: 5000,
         homeownerIds: [2, 3],
+        tasks: [],
       });
 
       expect(mockJobsRepository.create).toHaveBeenCalledWith({
@@ -271,6 +272,7 @@ describe("JobsService", () => {
         cost: 5000,
         homeownerIds: [2, 3],
         createdByUserId: 1,
+        tasks: [],
       });
       expect(result).toEqual({ data: job });
     });
@@ -284,6 +286,7 @@ describe("JobsService", () => {
         location: "123 Main St",
         cost: 5000,
         homeownerIds: [],
+        tasks: [],
       });
 
       expect(mockJobsRepository.create).toHaveBeenCalledWith({
@@ -292,6 +295,7 @@ describe("JobsService", () => {
         cost: 5000,
         homeownerIds: [],
         createdByUserId: 1,
+        tasks: [],
       });
     });
 
@@ -303,6 +307,7 @@ describe("JobsService", () => {
           location: "123 Main St",
           cost: 5000,
           homeownerIds: [],
+          tasks: [],
         }),
       ).rejects.toThrow("Description should not be empty");
 
@@ -322,6 +327,7 @@ describe("JobsService", () => {
           location: "123 Main St",
           cost: 5000,
           homeownerIds: [],
+          tasks: [],
         }),
       ).rejects.toThrow(ProtectedRouteError);
 
@@ -336,6 +342,7 @@ describe("JobsService", () => {
           location: "123 Main St",
           cost: 5000,
           homeownerIds: [],
+          tasks: [],
         }),
       ).rejects.toThrow("Only contractors can create new jobs");
 
@@ -732,6 +739,151 @@ describe("JobsService", () => {
       ).rejects.toThrow("Job not found");
 
       expect(mockJobsRepository.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("loadTasksByJobId", () => {
+    const tasks = [
+      {
+        id: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: undefined,
+        completedByUserId: null,
+      },
+      {
+        id: 2,
+        description: "Task 2",
+        cost: 2000,
+        completedAt: "2024-01-02T00:00:00.000Z",
+        completedByUserId: 1,
+      },
+    ];
+
+    it("should load tasks by job id when user is authenticated", async () => {
+      mockJobsRepository.loadTasksByJobId.mockResolvedValue(tasks);
+
+      const result = await service.loadTasksByJobId({
+        context: contractorContext,
+        id: 1,
+      });
+
+      expect(mockJobsRepository.loadTasksByJobId).toHaveBeenCalledWith(1);
+      expect(result).toEqual(tasks);
+    });
+
+    it("should load tasks by job id when homeowner is authenticated", async () => {
+      mockJobsRepository.loadTasksByJobId.mockResolvedValue(tasks);
+
+      const result = await service.loadTasksByJobId({
+        context: homeownerContext,
+        id: 1,
+      });
+
+      expect(mockJobsRepository.loadTasksByJobId).toHaveBeenCalledWith(1);
+      expect(result).toEqual(tasks);
+    });
+
+    it("should throw ProtectedRouteError when user is not authenticated", async () => {
+      const contextWithoutUser: RequestContext = {
+        req: {} as Request,
+        userData: undefined,
+      };
+
+      await expect(
+        service.loadTasksByJobId({
+          context: contextWithoutUser,
+          id: 1,
+        }),
+      ).rejects.toThrow(ProtectedRouteError);
+
+      expect(mockJobsRepository.loadTasksByJobId).not.toHaveBeenCalled();
+    });
+
+    it("should return empty array when no tasks exist", async () => {
+      mockJobsRepository.loadTasksByJobId.mockResolvedValue([]);
+
+      const result = await service.loadTasksByJobId({
+        context: contractorContext,
+        id: 1,
+      });
+
+      expect(mockJobsRepository.loadTasksByJobId).toHaveBeenCalledWith(1);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("completeJobTask", () => {
+    const completedTask = {
+      id: 1,
+      description: "Task 1",
+      cost: 1000,
+      completedAt: "2024-01-02T00:00:00.000Z",
+      completedByUserId: 1,
+    };
+
+    it("should complete a job task when contractor is authenticated", async () => {
+      mockJobsRepository.updateJobTask.mockResolvedValue(completedTask);
+
+      const result = await service.completeJobTask({
+        context: contractorContext,
+        id: 1,
+      });
+
+      expect(mockJobsRepository.updateJobTask).toHaveBeenCalledWith({
+        id: 1,
+        completedByUserId: 1,
+        completedAt: expect.any(String) as string,
+      });
+      expect(result).toEqual({ data: completedTask });
+      expect(result.data.completedByUserId).toBe(1);
+      expect(result.data.completedAt).toBeDefined();
+    });
+
+    it("should throw ProtectedRouteError when user is not authenticated", async () => {
+      const contextWithoutUser: RequestContext = {
+        req: {} as Request,
+        userData: undefined,
+      };
+
+      await expect(
+        service.completeJobTask({
+          context: contextWithoutUser,
+          id: 1,
+        }),
+      ).rejects.toThrow(ProtectedRouteError);
+
+      expect(mockJobsRepository.updateJobTask).not.toHaveBeenCalled();
+    });
+
+    it("should throw error when homeowner tries to complete task", async () => {
+      await expect(
+        service.completeJobTask({
+          context: homeownerContext,
+          id: 1,
+        }),
+      ).rejects.toThrow("Only contractors can complete job tasks");
+
+      expect(mockJobsRepository.updateJobTask).not.toHaveBeenCalled();
+    });
+
+    it("should set completedAt timestamp when completing task", async () => {
+      const beforeTime = new Date().toISOString();
+      mockJobsRepository.updateJobTask.mockResolvedValue(completedTask);
+
+      await service.completeJobTask({
+        context: contractorContext,
+        id: 1,
+      });
+
+      const afterTime = new Date().toISOString();
+      const callArgs = mockJobsRepository.updateJobTask.mock.calls[0]?.[0];
+      expect(callArgs?.completedAt).toBeDefined();
+      if (callArgs?.completedAt) {
+        const completedAtTime = new Date(callArgs.completedAt).toISOString();
+        expect(completedAtTime >= beforeTime).toBe(true);
+        expect(completedAtTime <= afterTime).toBe(true);
+      }
     });
   });
 });

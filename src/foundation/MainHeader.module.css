@@ -39,6 +39,11 @@
   justify-content: center;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
 
 @media (max-width: 768px) {
   .header {

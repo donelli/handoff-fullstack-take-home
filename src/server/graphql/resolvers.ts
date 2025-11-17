@@ -7,11 +7,11 @@ export function buildResolvers() {
   };
 }
 
-export function adaptServiceCall<R, C extends () => R>(
-  call: C,
-): R | { __typename: string; message: string; code: string } {
+export async function adaptServiceCall<R>(
+  call: () => R | Promise<R>,
+): Promise<R | { __typename: string; message: string; code: string }> {
   try {
-    return call();
+    return await call();
   } catch (error) {
     if (error instanceof DomainError) {
       return {

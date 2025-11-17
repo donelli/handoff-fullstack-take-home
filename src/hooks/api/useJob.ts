@@ -14,6 +14,12 @@ const JOB_QUERY = gql`
       endDate
       createdAt
       updatedAt
+      tasks {
+        id
+        description
+        cost
+        completedAt
+      }
       createdByUser {
         id
         name
@@ -25,6 +31,13 @@ const JOB_QUERY = gql`
     }
   }
 `;
+
+export type JobTask = {
+  id: number;
+  description: string;
+  cost: number;
+  completedAt: string | null;
+};
 
 export type JobData = {
   id: number;
@@ -38,6 +51,7 @@ export type JobData = {
   updatedAt: string;
   createdByUser: User;
   homeowners: User[];
+  tasks: JobTask[];
 };
 
 export type JobQueryResponse = {

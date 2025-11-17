@@ -29,7 +29,10 @@ export function NumberInput(props: NumberInputProps) {
   return (
     <div className={styles.textBoxContainer}>
       {props.label && (
-        <label className={styles.textBoxLabel}>{props.label}</label>
+        <label className={styles.textBoxLabel}>
+          {props.label}
+          {required && <span className={styles.required}> *</span>}
+        </label>
       )}
       <div className={styles.textBoxInputContainer}>
         {prefix && <span className={styles.textBoxPrefix}>{prefix}</span>}

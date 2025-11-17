@@ -69,6 +69,11 @@ export const buildJobsResolvers = ({
           usersService.loadHomeownersByJobId(parent.id),
         );
       },
+      tasks: (parent: { id: number }, _: unknown, context: RequestContext) => {
+        return adaptServiceCall(() =>
+          jobsService.loadTasksByJobId({ id: parent.id, context }),
+        );
+      },
     },
     Mutation: {
       createJob: (
@@ -117,6 +122,15 @@ export const buildJobsResolvers = ({
           return jobsService.changeStatus({ id, status, context });
         });
       },
+      completeJobTask: (
+        _: unknown,
+        { id }: { id: number },
+        context: RequestContext,
+      ) => {
+        return adaptServiceCall(() => {
+          return jobsService.completeJobTask({ id, context });
+        });
+      },
     },
   };
 };
@@ -131,7 +145,13 @@ type LoadJobsFilter = {
 
 type CreateJobInput = Pick<
   CreateJobPayload,
-  "description" | "cost" | "location" | "homeownerIds" | "startDate" | "endDate"
+  | "description"
+  | "cost"
+  | "location"
+  | "homeownerIds"
+  | "startDate"
+  | "endDate"
+  | "tasks"
 >;
 
 type UpdateJobInput = Pick<

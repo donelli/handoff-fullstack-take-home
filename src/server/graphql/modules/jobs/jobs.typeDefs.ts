@@ -45,6 +45,7 @@ export const jobsTypeDefs = gql`
     deletedByUserId: Int
     deletedByUser: User
     homeowners: [User!]
+    tasks: [JobTask!]
   }
 
   enum JobStatus {
@@ -54,6 +55,25 @@ export const jobsTypeDefs = gql`
     CANCELED
   }
 
+  type JobTask {
+    id: Int!
+    description: String!
+    completedAt: String
+    completedByUserId: Int
+    cost: Float
+  }
+
+  input JobTaskCreateInput {
+    description: String!
+    cost: Float
+  }
+
+  input JobTaskUpdateInput {
+    id: Int
+    description: String
+    cost: Float
+  }
+
   input CreateJobInput {
     description: NonEmptyString!
     location: NonEmptyString!
@@ -61,6 +81,7 @@ export const jobsTypeDefs = gql`
     homeownerIds: [Int!]!
     startDate: String
     endDate: String
+    tasks: [JobTaskCreateInput!]
   }
 
   type CreateJobResult {
@@ -74,6 +95,7 @@ export const jobsTypeDefs = gql`
     homeownerIds: [Int!]
     startDate: String
     endDate: String
+    tasks: [JobTaskUpdateInput!]
   }
 
   type UpdateJobResult {
@@ -82,6 +104,10 @@ export const jobsTypeDefs = gql`
 
   type ChangeJobStatusResult {
     data: Job!
+  }
+
+  type CompleteJobTaskResult {
+    data: JobTask!
   }
 
   type Query {
@@ -94,5 +120,6 @@ export const jobsTypeDefs = gql`
     updateJob(id: Int!, input: UpdateJobInput!): UpdateJobResult!
     deleteJob(id: Int!): Boolean!
     changeJobStatus(id: Int!, status: JobStatus!): ChangeJobStatusResult!
+    completeJobTask(id: Int!): CompleteJobTaskResult!
   }
 `;

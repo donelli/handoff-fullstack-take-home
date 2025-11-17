@@ -38,7 +38,7 @@ export class JobChatMessageRepository {
       content: prismaJobChatMessage.content,
       jobId: prismaJobChatMessage.jobId,
       createdByUserId: prismaJobChatMessage.createdByUserId,
-      createdAt: prismaJobChatMessage.createdAt?.toISOString(),
+      createdAt: prismaJobChatMessage.createdAt.toISOString(),
     };
   }
 }

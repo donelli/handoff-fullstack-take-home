@@ -6,7 +6,9 @@ import { ContractorHome } from "~/components/home/ContractorHome";
 import { HomeownerHome } from "~/components/home/HomeownerHome";
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, ready } = useAuth();
+
+  if (!ready || !user) return <div />;
 
   const isContractor = user?.type === UserType.CONTRACTOR;
 

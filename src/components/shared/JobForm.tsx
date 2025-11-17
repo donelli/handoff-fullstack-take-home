@@ -17,7 +17,9 @@ import {
 import { useUsers } from "~/hooks/api";
 import type { User } from "~/models/user";
 import { DateInput } from "~/foundation/DateInput";
+import { Button } from "~/foundation/Button";
 import styles from "./JobForm.module.css";
+import { Divider } from "~/foundation/Divider";
 
 export type JobFormData = {
   description: string;
@@ -26,6 +28,15 @@ export type JobFormData = {
   homeownerIds: number[];
   startDate: string | null;
   endDate: string | null;
+  tasks: JobTaskData[];
+};
+
+export type JobTaskData = {
+  id?: number | null;
+  description: string;
+  cost?: number | null;
+  completedAt?: string | null;
+  completedByUserId?: number | null;
 };
 
 type JobData = {
@@ -36,6 +47,7 @@ type JobData = {
   homeowners: User[];
   startDate: string | null;
   endDate: string | null;
+  tasks?: JobTaskData[];
 };
 
 type JobFormProps = {
@@ -56,6 +68,7 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
     const [cost, setCost] = useState<number | "">("");
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+    const [tasks, setTasks] = useState<JobTaskData[]>([]);
     const formRef = useRef<HTMLFormElement>(null);
     const { homeowners, loading: isLoadingUsers } = useUsers();
     const [selectedHomeowners, setSelectedHomeowners] = useState<
@@ -82,6 +95,13 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
         );
         setStartDate(job.startDate ? new Date(job.startDate) : null);
         setEndDate(job.endDate ? new Date(job.endDate) : null);
+        setTasks(
+          job.tasks?.map((task) => ({
+            id: task.id,
+            description: task.description,
+            cost: task.cost ?? null,
+          })) ?? [],
+        );
       }
     }, [job]);
 
@@ -96,9 +116,43 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
         homeownerIds,
         startDate: startDate?.toISOString() ?? null,
         endDate: endDate?.toISOString() ?? null,
+        tasks,
       };
 
       await onSubmit(formData);
+    };
+
+    const addTask = () => {
+      setTasks([...tasks, { description: "", cost: null }]);
+    };
+
+    const removeTask = (index: number) => {
+      setTasks(tasks.filter((_, i) => i !== index));
+    };
+
+    const updateTask = (
+      index: number,
+      field: keyof JobTaskData,
+      value: string | number | null,
+    ) => {
+      const updatedTasks = [...tasks];
+      const currentTask = updatedTasks[index];
+      if (!currentTask) return;
+
+      if (field === "description") {
+        updatedTasks[index] = {
+          id: currentTask.id,
+          description: value as string,
+          cost: currentTask.cost ?? null,
+        };
+      } else if (field === "cost") {
+        updatedTasks[index] = {
+          id: currentTask.id,
+          description: currentTask.description,
+          cost: value as number | null,
+        };
+      }
+      setTasks(updatedTasks);
     };
 
     const isFormDisabled = disabled || loading;
@@ -168,6 +222,53 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
           disabled={isFormDisabled || isLoadingUsers}
           loading={isLoadingUsers}
         />
+
+        <Divider />
+
+        <div className={styles.tasksSection}>
+          <div className={styles.tasksHeader}>
+            <label className={styles.tasksLabel}>Tasks</label>
+            <Button type="button" onClick={addTask} disabled={isFormDisabled}>
+              Add New Task
+            </Button>
+          </div>
+          {tasks.length > 0 && (
+            <div className={styles.tasksList}>
+              {tasks.map((task, index) => (
+                <div key={index} className={styles.taskCard}>
+                  <TextBox
+                    value={task.description}
+                    onChange={(value) =>
+                      updateTask(index, "description", value)
+                    }
+                    placeholder="Enter task description"
+                    label="Description"
+                    required
+                    readonly={isFormDisabled}
+                  />
+                  <NumberInput
+                    value={task.cost ?? ""}
+                    onChange={(value) => updateTask(index, "cost", value)}
+                    placeholder="Enter task cost"
+                    label="Cost"
+                    min={0}
+                    step={0.01}
+                    readonly={isFormDisabled}
+                    prefix="$"
+                  />
+                  <Button
+                    type="button"
+                    variant="danger"
+                    onClick={() => removeTask(index)}
+                    disabled={isFormDisabled}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </form>
     );
   },

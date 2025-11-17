@@ -9,8 +9,9 @@ export { useUpdateJob } from "./useUpdateJob";
 export { useDeleteJob } from "./useDeleteJob";
 export { useChangeJobStatus } from "./useChangeJobStatus";
 export { useCreateJobChatMessage } from "./useCreateJobChatMessage";
+export { useCompleteJobTask } from "./useCompleteJobTask";
 
-export type { JobListItem, LoadJobsResponse, JobsFilter } from "./useJobs";
+export type { JobListItem, LoadJobsResponse, LoadJobsFilter } from "./useJobs";
 export type { JobData } from "./useJob";
 export type { JobForEditData } from "./useJobForEdit";
 export type { JobChatMessage } from "./useJobChatMessages";

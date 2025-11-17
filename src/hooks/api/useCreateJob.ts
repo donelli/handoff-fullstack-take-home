@@ -10,11 +10,17 @@ const CREATE_JOB_MUTATION = gql`
   }
 `;
 
+export type JobTaskCreateInput = {
+  description: string;
+  cost: number;
+};
+
 export type CreateJobInput = {
   description: string;
   location: string;
   cost: number;
   homeownerIds: number[];
+  tasks: JobTaskCreateInput[];
 };
 
 export type CreateJobMutationResponse = {

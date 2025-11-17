@@ -64,3 +64,22 @@ a {
   --font-color-primary: var(--black);
   --font-color-secondary: var(--gray-700);
 }
+
+.react-datepicker, .react-datepicker__header, .react-datepicker__time-container  {
+  border-color: var(--card-border-color) !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  width: 6px !important;
+  height: 6px !important;
+  border-width: 2px 2px 0 0 !important;
+}
+
+.react-datepicker__header {
+  background-color: var(--gray-100) !important;
+}
+
+.react-datepicker-wrapper {
+  width: 100% !important;
+  display: block !important;
+}

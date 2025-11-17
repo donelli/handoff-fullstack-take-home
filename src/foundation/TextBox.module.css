@@ -3,6 +3,7 @@
     padding: var(--spacing-sm);
     border-radius: var(--border-sm);
     font-family: inherit;
+    width: 100%;
 }
 
 .textBoxLabel {
@@ -15,6 +16,7 @@
     display: flex;
     flex-direction: column;
     margin-bottom: var(--spacing-md);
+    width: 100%;
 }
 
 .textBoxInputContainer {

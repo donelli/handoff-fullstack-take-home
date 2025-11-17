@@ -10,6 +10,8 @@ const JOB_QUERY = gql`
       location
       cost
       status
+      startDate
+      endDate
       createdAt
       updatedAt
       createdByUser {
@@ -30,6 +32,8 @@ export type JobData = {
   location: string;
   cost: number;
   status: JobStatus;
+  startDate?: string | null;
+  endDate?: string | null;
   createdAt: string;
   updatedAt: string;
   createdByUser: User;

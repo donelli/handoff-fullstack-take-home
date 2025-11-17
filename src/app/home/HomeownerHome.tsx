@@ -49,12 +49,22 @@ const JobCard = ({
             {formatCurrency(job.cost)}
           </span>
         </div>
-        <div className={styles.jobCardField}>
-          <span className={styles.jobCardLabel}>Updated:</span>
-          <span className={styles.jobCardValue}>
-            {formatDate(job.updatedAt)}
-          </span>
-        </div>
+        {job.startDate && (
+          <div className={styles.jobCardField}>
+            <span className={styles.jobCardLabel}>Start Date:</span>
+            <span className={styles.jobCardValue}>
+              {formatDate(job.startDate)}
+            </span>
+          </div>
+        )}
+        {job.endDate && (
+          <div className={styles.jobCardField}>
+            <span className={styles.jobCardLabel}>End Date:</span>
+            <span className={styles.jobCardValue}>
+              {formatDate(job.endDate)}
+            </span>
+          </div>
+        )}
       </div>
     </Link>
   );
@@ -189,4 +199,3 @@ export const HomeownerHome = () => {
     </main>
   );
 };
-

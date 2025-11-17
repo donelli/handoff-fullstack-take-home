@@ -8,6 +8,8 @@ const JOB_QUERY = gql`
       description
       location
       cost
+      startDate
+      endDate
       homeowners {
         id
         name

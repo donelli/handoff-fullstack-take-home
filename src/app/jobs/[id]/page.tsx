@@ -148,16 +148,28 @@ export default function JobDetailsPage() {
               />
             )}
 
-            <InfoField label="Updated At" value={formatDate(job.updatedAt)} />
-
-            {isContractor && (
-              <InfoField
-                label="Created By"
-                value={<HomeownersList homeowners={[job.createdByUser]} />}
-              />
+            {(!!job.startDate || !!job.endDate) && (
+              <div className={styles.sideBySideFields}>
+                <InfoField
+                  label="Start Date"
+                  value={formatDate(job.startDate)}
+                />
+                <InfoField label="End Date" value={formatDate(job.endDate)} />
+              </div>
             )}
 
-            <InfoField label="Created At" value={formatDate(job.createdAt)} />
+            <div className={styles.sideBySideFields}>
+              <InfoField label="Created At" value={formatDate(job.createdAt)} />
+
+              {isContractor && (
+                <InfoField
+                  label="Created By"
+                  value={<HomeownersList homeowners={[job.createdByUser]} />}
+                />
+              )}
+            </div>
+
+            <InfoField label="Updated At" value={formatDate(job.updatedAt)} />
           </div>
           <div className={styles.rightColumn}>
             <JobChat jobId={jobId} />

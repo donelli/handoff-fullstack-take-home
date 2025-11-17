@@ -16,12 +16,16 @@ import {
 } from "~/foundation/Autocomplete";
 import { useUsers } from "~/hooks/api";
 import type { User } from "~/models/user";
+import { DateInput } from "~/foundation/DateInput";
+import styles from "./JobForm.module.css";
 
 export type JobFormData = {
   description: string;
   location: string;
   cost: number;
   homeownerIds: number[];
+  startDate: string | null;
+  endDate: string | null;
 };
 
 type JobData = {
@@ -30,6 +34,8 @@ type JobData = {
   location: string;
   cost: number;
   homeowners: User[];
+  startDate: string | null;
+  endDate: string | null;
 };
 
 type JobFormProps = {
@@ -48,6 +54,8 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
     const [description, setDescription] = useState("");
     const [location, setLocation] = useState("");
     const [cost, setCost] = useState<number | "">("");
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     const formRef = useRef<HTMLFormElement>(null);
     const { homeowners, loading: isLoadingUsers } = useUsers();
     const [selectedHomeowners, setSelectedHomeowners] = useState<
@@ -72,6 +80,8 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
             data: homeowner,
           })),
         );
+        setStartDate(job.startDate ? new Date(job.startDate) : null);
+        setEndDate(job.endDate ? new Date(job.endDate) : null);
       }
     }, [job]);
 
@@ -84,6 +94,8 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
         location,
         cost: typeof cost === "number" ? cost : 0,
         homeownerIds,
+        startDate: startDate?.toISOString() ?? null,
+        endDate: endDate?.toISOString() ?? null,
       };
 
       await onSubmit(formData);
@@ -121,6 +133,25 @@ export const JobForm = forwardRef<JobFormRef, JobFormProps>(
           readonly={isFormDisabled}
           prefix="$"
         />
+
+        <div className={styles.dateInputs}>
+          <DateInput
+            value={startDate}
+            onChange={setStartDate}
+            placeholder="Enter job start date"
+            label="Start Date"
+            readonly={isFormDisabled}
+            maxDate={endDate}
+          />
+          <DateInput
+            value={endDate}
+            onChange={setEndDate}
+            placeholder="Enter job end date"
+            label="End Date"
+            readonly={isFormDisabled}
+            minDate={startDate}
+          />
+        </div>
 
         <Autocomplete
           options={homeowners.map((homeowner) => ({

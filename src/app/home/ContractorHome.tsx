@@ -1,3 +1,5 @@
+"use client";
+
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import {
@@ -18,6 +20,7 @@ import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
 import { useUserContext } from "~/hooks/useUserContext";
 import { MdAdd } from "react-icons/md";
 import { loadJobs, type JobListItem } from "~/hooks/api";
+import type { LoadJobsSortField } from "~/hooks/api/useJobs";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -43,9 +46,17 @@ export const ContractorHome = () => {
         const page = Math.floor(params.startRow / pageSize) + 1;
         const limit = pageSize;
 
+        const sortField = params.sortModel?.[0]?.colId;
+        const sortDirection = params.sortModel?.[0]?.sort;
+
         void (async () => {
           try {
-            const result = await loadJobs(apolloClient, { page, limit });
+            const result = await loadJobs(apolloClient, {
+              page,
+              limit,
+              sortField: sortField as LoadJobsSortField,
+              sortDirection,
+            });
 
             params.successCallback(result.jobs, result.pagination.total);
 
@@ -83,7 +94,12 @@ export const ContractorHome = () => {
 
   const colDefs = useMemo<ColDef<JobListItem>[]>(
     () => [
-      { field: "id", headerName: "#", resizable: false, flex: 0.3 },
+      {
+        field: "id",
+        headerName: "#",
+        resizable: false,
+        flex: 0.3,
+      },
       {
         field: "description",
         headerName: "Description",
@@ -102,22 +118,38 @@ export const ContractorHome = () => {
         headerName: "Status",
         cellRenderer: (params: ValueFormatterParams<JobListItem, JobStatus>) =>
           params.value ? <JobStatusBadge status={params.value} /> : "-",
+        sortable: true,
+        initialSort: "desc",
       },
       {
         field: "cost",
         headerName: "Cost",
         valueFormatter: (params) => formatCurrency(params.value),
       },
+      {
+        field: "startDate",
+        headerName: "Start Date",
+        valueFormatter: (params) => formatDate(params.value),
+        sortable: true,
+      },
+      {
+        field: "endDate",
+        headerName: "End Date",
+        valueFormatter: (params) => formatDate(params.value),
+        sortable: true,
+      },
 
       {
         field: "updatedAt",
         headerName: "Updated At",
         valueFormatter: (params) => formatDate(params.value),
+        sortable: true,
       },
       {
         field: "createdAt",
         headerName: "Created At",
         valueFormatter: (params) => formatDate(params.value),
+        sortable: true,
       },
     ],
     [formatDate, formatCurrency],

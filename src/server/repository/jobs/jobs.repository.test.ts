@@ -374,6 +374,7 @@ describe("JobsRepository", () => {
         cost: 5000,
         homeownerIds: [2, 3],
         createdByUserId: 1,
+        tasks: [],
       });
 
       expect(mockDb.job.create).toHaveBeenCalledWith({
@@ -388,6 +389,9 @@ describe("JobsRepository", () => {
           },
           startDate: undefined,
           endDate: undefined,
+          tasks: {
+            create: [],
+          },
         },
       });
       expect(result).toEqual(
@@ -426,6 +430,7 @@ describe("JobsRepository", () => {
         cost: 5000,
         homeownerIds: [],
         createdByUserId: 1,
+        tasks: [],
       });
 
       expect(mockDb.job.create).toHaveBeenCalledWith({
@@ -440,6 +445,9 @@ describe("JobsRepository", () => {
           },
           startDate: undefined,
           endDate: undefined,
+          tasks: {
+            create: [],
+          },
         },
       });
     });
@@ -470,6 +478,7 @@ describe("JobsRepository", () => {
         createdByUserId: 1,
         startDate: "2024-02-01T00:00:00.000Z",
         endDate: "2024-02-15T00:00:00.000Z",
+        tasks: [],
       });
 
       expect(mockDb.job.create).toHaveBeenCalledWith({
@@ -484,6 +493,9 @@ describe("JobsRepository", () => {
           },
           startDate: "2024-02-01T00:00:00.000Z",
           endDate: "2024-02-15T00:00:00.000Z",
+          tasks: {
+            create: [],
+          },
         },
       });
       expect(result).toEqual(
@@ -496,6 +508,104 @@ describe("JobsRepository", () => {
           createdByUserId: 1,
         }),
       );
+    });
+
+    it("should create a job with tasks", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-01"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      mockDb.job.create.mockResolvedValue(prismaJob);
+
+      await repository.create({
+        description: "Fix roof",
+        location: "123 Main St",
+        cost: 5000,
+        homeownerIds: [2],
+        createdByUserId: 1,
+        tasks: [
+          { description: "Task 1", cost: 1000 },
+          { description: "Task 2", cost: 2000 },
+        ],
+      });
+
+      expect(mockDb.job.create).toHaveBeenCalledWith({
+        data: {
+          cost: 5000,
+          description: "Fix roof",
+          location: "123 Main St",
+          createdByUserId: 1,
+          status: "PLANNING",
+          homeowners: {
+            connect: [{ id: 2 }],
+          },
+          startDate: undefined,
+          endDate: undefined,
+          tasks: {
+            create: [
+              { description: "Task 1", cost: 1000 },
+              { description: "Task 2", cost: 2000 },
+            ],
+          },
+        },
+      });
+    });
+
+    it("should create a job with empty tasks array", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-01"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      mockDb.job.create.mockResolvedValue(prismaJob);
+
+      await repository.create({
+        description: "Fix roof",
+        location: "123 Main St",
+        cost: 5000,
+        homeownerIds: [],
+        createdByUserId: 1,
+        tasks: [],
+      });
+
+      expect(mockDb.job.create).toHaveBeenCalledWith({
+        data: {
+          cost: 5000,
+          description: "Fix roof",
+          location: "123 Main St",
+          createdByUserId: 1,
+          status: "PLANNING",
+          homeowners: {
+            connect: [],
+          },
+          startDate: undefined,
+          endDate: undefined,
+          tasks: {
+            create: [],
+          },
+        },
+      });
     });
   });
 
@@ -698,6 +808,254 @@ describe("JobsRepository", () => {
           endDate: null,
         },
       });
+    });
+
+    it("should create new tasks when updating job", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      mockDb.jobTask.findMany.mockResolvedValue([]);
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        tasks: [
+          { description: "New Task 1", cost: 1000 },
+          { description: "New Task 2", cost: 2000 },
+        ],
+      });
+
+      expect(mockDb.jobTask.findMany).toHaveBeenCalledWith({
+        where: { jobId: 1 },
+      });
+      expect(mockDb.job.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: {
+          updatedAt: expect.any(Date) as unknown,
+          status: undefined,
+          homeowners: undefined,
+          startDate: undefined,
+          endDate: undefined,
+          tasks: {
+            create: [
+              { description: "New Task 1", cost: 1000 },
+              { description: "New Task 2", cost: 2000 },
+            ],
+          },
+        },
+      });
+    });
+
+    it("should update existing tasks when updating job", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      const existingTasks = [
+        {
+          id: 1,
+          jobId: 1,
+          description: "Task 1",
+          cost: 1000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+        {
+          id: 2,
+          jobId: 1,
+          description: "Task 2",
+          cost: 2000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+      ];
+
+      mockDb.jobTask.findMany.mockResolvedValue(existingTasks);
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        tasks: [
+          { id: 1, description: "Updated Task 1", cost: 1500 },
+          { id: 2, description: "Updated Task 2", cost: 2500 },
+        ],
+      });
+
+      expect(mockDb.jobTask.findMany).toHaveBeenCalledWith({
+        where: { jobId: 1 },
+      });
+      const updateCall = mockDb.job.update.mock.calls[0]?.[0];
+      expect(updateCall).toBeDefined();
+      expect(updateCall?.where?.id).toBe(1);
+      const tasksData = (updateCall?.data as { tasks?: unknown })?.tasks;
+      expect(tasksData).toBeDefined();
+    });
+
+    it("should delete tasks not in payload when updating job", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      const existingTasks = [
+        {
+          id: 1,
+          jobId: 1,
+          description: "Task 1",
+          cost: 1000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+        {
+          id: 2,
+          jobId: 1,
+          description: "Task 2",
+          cost: 2000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+        {
+          id: 3,
+          jobId: 1,
+          description: "Task 3",
+          cost: 3000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+      ];
+
+      mockDb.jobTask.findMany.mockResolvedValue(existingTasks);
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        tasks: [{ id: 1, description: "Task 1", cost: 1000 }],
+      });
+
+      expect(mockDb.jobTask.findMany).toHaveBeenCalledWith({
+        where: { jobId: 1 },
+      });
+      const updateCall = mockDb.job.update.mock.calls[0]?.[0];
+      expect(updateCall).toBeDefined();
+      const tasksData = (updateCall?.data as { tasks?: unknown })?.tasks;
+      expect(tasksData).toBeDefined();
+    });
+
+    it("should handle mixed create, update, and delete operations", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      const existingTasks = [
+        {
+          id: 1,
+          jobId: 1,
+          description: "Task 1",
+          cost: 1000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+        {
+          id: 2,
+          jobId: 1,
+          description: "Task 2",
+          cost: 2000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+      ];
+
+      mockDb.jobTask.findMany.mockResolvedValue(existingTasks);
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        tasks: [
+          { id: 1, description: "Updated Task 1", cost: 1500 },
+          { description: "New Task 3", cost: 3000 },
+        ],
+      });
+
+      expect(mockDb.jobTask.findMany).toHaveBeenCalledWith({
+        where: { jobId: 1 },
+      });
+      const updateCall = mockDb.job.update.mock.calls[0]?.[0];
+      expect(updateCall).toBeDefined();
+      const tasksData = (updateCall?.data as { tasks?: unknown })?.tasks;
+      expect(tasksData).toBeDefined();
+    });
+
+    it("should not update tasks when tasks is undefined", async () => {
+      const prismaJob: PrismaJob = {
+        id: 1,
+        description: "Fix roof",
+        location: "123 Main St",
+        status: "PLANNING",
+        cost: 5000,
+        createdByUserId: 1,
+        createdAt: new Date("2024-01-01"),
+        updatedAt: new Date("2024-01-02"),
+        deletedAt: null,
+        deletedByUserId: null,
+        startDate: null,
+        endDate: null,
+      };
+
+      mockDb.job.update.mockResolvedValue(prismaJob);
+
+      await repository.update({
+        id: 1,
+        description: "Updated description",
+      });
+
+      const updateCall = mockDb.job.update.mock.calls[0]?.[0];
+      expect(updateCall).toBeDefined();
+      const tasksData = (updateCall?.data as { tasks?: unknown })?.tasks;
+      expect(tasksData).toBeUndefined();
     });
   });
 
@@ -946,6 +1304,199 @@ describe("JobsRepository", () => {
     it("should map CANCELED status correctly", () => {
       const result = repository.mapJobStatusToDomain("CANCELED");
       expect(result).toBe(JobStatus.CANCELED);
+    });
+  });
+
+  describe("loadTasksByJobId", () => {
+    it("should load tasks for a job", async () => {
+      const prismaTasks = [
+        {
+          id: 1,
+          jobId: 1,
+          description: "Task 1",
+          cost: 1000,
+          completedAt: null,
+          completedByUserId: null,
+        },
+        {
+          id: 2,
+          jobId: 1,
+          description: "Task 2",
+          cost: 2000,
+          completedAt: new Date("2024-01-02"),
+          completedByUserId: 1,
+        },
+      ];
+
+      mockDb.jobTask.findMany.mockResolvedValue(prismaTasks);
+
+      const result = await repository.loadTasksByJobId(1);
+
+      expect(mockDb.jobTask.findMany).toHaveBeenCalledWith({
+        where: { jobId: 1 },
+      });
+      expect(result).toEqual([
+        {
+          id: 1,
+          description: "Task 1",
+          cost: 1000,
+          completedAt: undefined,
+          completedByUserId: null,
+        },
+        {
+          id: 2,
+          description: "Task 2",
+          cost: 2000,
+          completedAt: "2024-01-02T00:00:00.000Z",
+          completedByUserId: 1,
+        },
+      ]);
+    });
+
+    it("should return empty array when no tasks exist", async () => {
+      mockDb.jobTask.findMany.mockResolvedValue([]);
+
+      const result = await repository.loadTasksByJobId(1);
+
+      expect(mockDb.jobTask.findMany).toHaveBeenCalledWith({
+        where: { jobId: 1 },
+      });
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("updateJobTask", () => {
+    it("should update a job task with completion data", async () => {
+      const prismaTask = {
+        id: 1,
+        jobId: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: new Date("2024-01-02"),
+        completedByUserId: 1,
+      };
+
+      mockDb.jobTask.update.mockResolvedValue(prismaTask);
+
+      const result = await repository.updateJobTask({
+        id: 1,
+        completedByUserId: 1,
+        completedAt: "2024-01-02T00:00:00.000Z",
+      });
+
+      expect(mockDb.jobTask.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: {
+          completedByUserId: 1,
+          completedAt: "2024-01-02T00:00:00.000Z",
+        },
+      });
+      expect(result).toEqual({
+        id: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: "2024-01-02T00:00:00.000Z",
+        completedByUserId: 1,
+      });
+    });
+
+    it("should update a job task with null completion data", async () => {
+      const prismaTask = {
+        id: 1,
+        jobId: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: null,
+        completedByUserId: null,
+      };
+
+      mockDb.jobTask.update.mockResolvedValue(prismaTask);
+
+      const result = await repository.updateJobTask({
+        id: 1,
+        completedByUserId: undefined,
+        completedAt: null,
+      });
+
+      expect(mockDb.jobTask.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: {
+          completedByUserId: undefined,
+          completedAt: null,
+        },
+      });
+      expect(result).toEqual({
+        id: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: undefined,
+        completedByUserId: null,
+      });
+    });
+  });
+
+  describe("mapTaskToDomain", () => {
+    it("should map Prisma task to domain task model", () => {
+      const prismaTask = {
+        id: 1,
+        jobId: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: null,
+        completedByUserId: null,
+      };
+
+      const result = repository.mapTaskToDomain(prismaTask);
+
+      expect(result).toEqual({
+        id: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: undefined,
+        completedByUserId: null,
+      });
+    });
+
+    it("should map completed task correctly", () => {
+      const prismaTask = {
+        id: 1,
+        jobId: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: new Date("2024-01-02T00:00:00Z"),
+        completedByUserId: 1,
+      };
+
+      const result = repository.mapTaskToDomain(prismaTask);
+
+      expect(result).toEqual({
+        id: 1,
+        description: "Task 1",
+        cost: 1000,
+        completedAt: "2024-01-02T00:00:00.000Z",
+        completedByUserId: 1,
+      });
+    });
+
+    it("should handle task with null cost", () => {
+      const prismaTask = {
+        id: 1,
+        jobId: 1,
+        description: "Task 1",
+        cost: null,
+        completedAt: null,
+        completedByUserId: null,
+      };
+
+      const result = repository.mapTaskToDomain(prismaTask);
+
+      expect(result).toEqual({
+        id: 1,
+        description: "Task 1",
+        cost: null,
+        completedAt: undefined,
+        completedByUserId: null,
+      });
     });
   });
 });

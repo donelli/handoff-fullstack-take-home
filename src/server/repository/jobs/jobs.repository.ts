@@ -4,6 +4,7 @@ import {
   type JobStatus as PrismaJobStatus,
   type Prisma,
   type Job as PrismaJob,
+  type JobTask as PrismaJobTask,
 } from "generated/prisma";
 import { JobStatus } from "~/models/job";
 
@@ -33,6 +34,11 @@ type LoadJobsResult = {
   data: JobModel[];
 };
 
+export type JobTaskCreatePayload = {
+  description: string;
+  cost: number;
+};
+
 export type CreateJobPayload = {
   description: string;
   location: string;
@@ -41,6 +47,19 @@ export type CreateJobPayload = {
   createdByUserId: number;
   startDate?: string | null;
   endDate?: string | null;
+  tasks: JobTaskCreatePayload[];
+};
+
+export type UpdateJobTaskPayload = {
+  id: number;
+  completedByUserId?: number;
+  completedAt?: string | null;
+};
+
+export type JobTaskUpdatePayload = {
+  id?: number;
+  description?: string;
+  cost?: number;
 };
 
 export type UpdateJobPayload = {
@@ -53,6 +72,7 @@ export type UpdateJobPayload = {
   status?: JobStatus;
   startDate?: string | null;
   endDate?: string | null;
+  tasks?: JobTaskUpdatePayload[];
 };
 
 type DeleteJobPayload = {
@@ -149,6 +169,7 @@ export class JobsRepository {
       homeownerIds,
       startDate,
       endDate,
+      tasks,
     } = payload;
 
     const result = await this.db.job.create({
@@ -163,6 +184,12 @@ export class JobsRepository {
         },
         startDate,
         endDate,
+        tasks: {
+          create: tasks.map((task) => ({
+            description: task.description,
+            cost: task.cost,
+          })),
+        },
       },
     });
 
@@ -179,7 +206,78 @@ export class JobsRepository {
       status,
       startDate,
       endDate,
+      tasks,
     } = payload;
+
+    let tasksNestedInput:
+      | Prisma.JobTaskUpdateManyWithoutJobNestedInput
+      | undefined;
+    if (tasks !== undefined) {
+      const existingTasks = await this.db.jobTask.findMany({
+        where: { jobId },
+      });
+
+      const existingTaskIds = new Set(existingTasks.map((task) => task.id));
+      const payloadTaskIds = new Set(
+        tasks.filter((task) => task.id !== undefined).map((task) => task.id!),
+      );
+
+      const tasksToDelete = existingTasks
+        .filter((task) => !payloadTaskIds.has(task.id))
+        .map((task) => task.id);
+
+      const taskUpdates: Prisma.JobTaskUpdateWithWhereUniqueWithoutJobInput[] =
+        [];
+      const taskCreates: Prisma.JobTaskCreateWithoutJobInput[] = [];
+
+      for (const task of tasks) {
+        if (task.id !== undefined && existingTaskIds.has(task.id)) {
+          const updateData: Prisma.JobTaskUncheckedUpdateWithoutJobInput = {};
+          if (task.description !== undefined) {
+            updateData.description = task.description;
+          }
+          if (task.cost !== undefined) {
+            updateData.cost = task.cost;
+          }
+
+          if (Object.keys(updateData).length > 0) {
+            taskUpdates.push({
+              where: { id: task.id },
+              data: updateData,
+            });
+          }
+        } else {
+          if (task.description !== undefined && task.cost !== undefined) {
+            taskCreates.push({
+              description: task.description,
+              cost: task.cost,
+            });
+          }
+        }
+      }
+
+      tasksNestedInput = {};
+      if (tasksToDelete.length > 0) {
+        tasksNestedInput.deleteMany = {
+          id: { in: tasksToDelete },
+        };
+      }
+      if (taskUpdates.length > 0) {
+        tasksNestedInput.update = taskUpdates;
+      }
+      if (taskCreates.length > 0) {
+        tasksNestedInput.create = taskCreates;
+      }
+
+      if (
+        tasksToDelete.length === 0 &&
+        taskUpdates.length === 0 &&
+        taskCreates.length === 0
+      ) {
+        tasksNestedInput = undefined;
+      }
+    }
+
     const result = await this.db.job.update({
       where: {
         id: jobId,
@@ -198,6 +296,7 @@ export class JobsRepository {
             : undefined,
         startDate: startDate,
         endDate: endDate,
+        ...(tasksNestedInput && { tasks: tasksNestedInput }),
       },
     });
 
@@ -270,5 +369,36 @@ export class JobsRepository {
       case "CANCELED":
         return JobStatus.CANCELED;
     }
+  }
+
+  async loadTasksByJobId(jobId: number) {
+    const tasks = await this.db.jobTask.findMany({
+      where: {
+        jobId,
+      },
+    });
+
+    return tasks.map((task) => this.mapTaskToDomain(task));
+  }
+
+  async updateJobTask(payload: UpdateJobTaskPayload) {
+    const { id, completedByUserId, completedAt } = payload;
+
+    const result = await this.db.jobTask.update({
+      where: { id },
+      data: { completedByUserId, completedAt },
+    });
+
+    return this.mapTaskToDomain(result);
+  }
+
+  mapTaskToDomain(task: PrismaJobTask) {
+    return {
+      id: task.id,
+      description: task.description,
+      cost: task.cost,
+      completedAt: task.completedAt?.toISOString(),
+      completedByUserId: task.completedByUserId,
+    };
   }
 }

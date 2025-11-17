@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { useApolloClient, gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 import Link from "next/link";
 import styles from "./HomeownerHome.module.css";
 import { Button } from "~/foundation/Button";
@@ -9,44 +9,7 @@ import { JobStatus } from "~/models/job";
 import { JobStatusBadge } from "../shared/JobStatusBadge";
 import { useUserContext } from "~/hooks/useUserContext";
 import { Spinner } from "~/foundation/Spinner";
-
-const LOAD_JOBS_QUERY = gql`
-  query LoadJobs($page: Int, $limit: Int, $status: [JobStatus!]) {
-    jobs(filter: { page: $page, limit: $limit, status: $status }) {
-      page
-      limit
-      total
-      data {
-        id
-        description
-        location
-        cost
-        status
-        createdAt
-        updatedAt
-      }
-    }
-  }
-`;
-
-type LoadJobsJobModel = {
-  id: number;
-  description: string;
-  location: string;
-  cost: number;
-  status: JobStatus;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type LoadJobsQuery = {
-  jobs: {
-    page: number;
-    limit: number;
-    total: number;
-    data: LoadJobsJobModel[];
-  };
-};
+import { loadJobs, type JobListItem } from "~/hooks/api";
 
 type JobSectionProps = {
   title: string;
@@ -61,7 +24,7 @@ const JobCard = ({
   formatDate,
   formatCurrency,
 }: {
-  job: LoadJobsJobModel;
+  job: JobListItem;
   formatDate: (date: unknown) => string;
   formatCurrency: (amount: unknown) => string;
 }) => {
@@ -104,31 +67,28 @@ const JobSection = ({
   formatDate,
   formatCurrency,
 }: JobSectionProps) => {
-  const [jobs, setJobs] = useState<LoadJobsJobModel[]>([]);
+  const [jobs, setJobs] = useState<JobListItem[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
-  const loadJobs = useCallback(
+  const loadJobsForPage = useCallback(
     async (page: number) => {
       setLoading(true);
       try {
-        const result = await apolloClient.query<LoadJobsQuery>({
-          query: LOAD_JOBS_QUERY,
-          variables: { page, limit: 10, status: statuses },
-          fetchPolicy: "network-only",
+        const result = await loadJobs(apolloClient, {
+          page,
+          limit: 10,
+          status: statuses,
         });
 
-        const newJobs = result.data?.jobs?.data ?? [];
-        const newTotal = result.data?.jobs?.total ?? 0;
-
         if (page === 1) {
-          setJobs(newJobs);
+          setJobs(result.jobs);
         } else {
-          setJobs((prev) => [...prev, ...newJobs]);
+          setJobs((prev) => [...prev, ...result.jobs]);
         }
-        setTotal(newTotal);
+        setTotal(result.pagination.total);
         setCurrentPage(page);
       } catch (error) {
         console.error("Failed to load jobs:", error);
@@ -141,12 +101,12 @@ const JobSection = ({
   );
 
   const handleLoadMore = useCallback(() => {
-    void loadJobs(currentPage + 1);
-  }, [currentPage, loadJobs]);
+    void loadJobsForPage(currentPage + 1);
+  }, [currentPage, loadJobsForPage]);
 
   useEffect(() => {
-    void loadJobs(1);
-  }, [loadJobs]);
+    void loadJobsForPage(1);
+  }, [loadJobsForPage]);
 
   const hasMore = jobs.length < total;
 

@@ -8,55 +8,9 @@ import {
   type JobFormRef,
   type JobFormData,
 } from "~/components/shared/JobForm";
-import { useQuery, useMutation, gql } from "@apollo/client";
 import { Spinner } from "~/foundation/Spinner";
 import { useToast } from "~/foundation/hooks/useToast";
-import type { User } from "~/models/user";
-
-const JOB_QUERY = gql`
-  query GetJob($id: Int!) {
-    job(id: $id) {
-      id
-      description
-      location
-      cost
-      homeowners {
-        id
-        name
-      }
-    }
-  }
-`;
-
-type JobData = {
-  id: number;
-  description: string;
-  location: string;
-  cost: number;
-  homeowners: User[];
-};
-
-type JobQueryResponse = {
-  job: JobData | null;
-};
-
-const UPDATE_JOB_MUTATION = gql`
-  mutation UpdateJob($id: Int!, $input: UpdateJobInput!) {
-    updateJob(id: $id, input: $input) {
-      data {
-        id
-      }
-    }
-  }
-`;
-
-type UpdateJobMutationResponse = {
-  updateJob: {
-    data: {
-      id: number;
-    };
-  };
-};
+import { useJobForEdit, useUpdateJob } from "~/hooks/api";
 
 export default function EditJobPage() {
   const params = useParams();
@@ -64,20 +18,9 @@ export default function EditJobPage() {
   const jobId = Number(params.id);
   const formRef = useRef<JobFormRef>(null);
   const { showErrorToast } = useToast();
-  const [updateJobMutation, { loading }] =
-    useMutation<UpdateJobMutationResponse>(UPDATE_JOB_MUTATION);
+  const { updateJob, loading } = useUpdateJob();
 
-  const {
-    data,
-    loading: isLoadingJob,
-    error,
-  } = useQuery<JobQueryResponse>(JOB_QUERY, {
-    variables: { id: jobId },
-    fetchPolicy: "network-only",
-    onError: () => {
-      showErrorToast("Failed to load job details");
-    },
-  });
+  const { job, loading: isLoadingJob, error } = useJobForEdit(jobId);
 
   if (isLoadingJob) {
     return (
@@ -116,7 +59,7 @@ export default function EditJobPage() {
     );
   }
 
-  if (!data?.job) {
+  if (!job) {
     return (
       <DetailsPageLayout title="Edit Job">
         <div
@@ -143,17 +86,10 @@ export default function EditJobPage() {
 
   const handleSubmit = async (formData: JobFormData) => {
     try {
-      const result = await updateJobMutation({
-        variables: {
-          id: jobId,
-          input: formData,
-        },
-      });
+      const result = await updateJob(jobId, formData);
 
-      const id = result.data?.updateJob.data?.id;
-
-      if (id) {
-        router.replace(`/jobs/${id}`);
+      if (result?.id) {
+        router.replace(`/jobs/${result.id}`);
       } else {
         showErrorToast("An unexpected error occurred!");
       }
@@ -174,7 +110,7 @@ export default function EditJobPage() {
     >
       <JobForm
         ref={formRef}
-        job={data.job}
+        job={job}
         onSubmit={handleSubmit}
         loading={loading}
       />

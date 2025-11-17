@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, gql } from "@apollo/client";
 import { useAuth } from "~/providers/auth-provider";
 import styles from "./JobChat.module.css";
 import { Spinner } from "~/foundation/Spinner";
 import { Button } from "~/foundation/Button";
 import { useToast } from "~/foundation/hooks/useToast";
+import { useJobChatMessages, useCreateJobChatMessage } from "~/hooks/api";
 
 const formatMessageTime = (dateString: string) => {
   const date = new Date(dateString);
@@ -19,59 +19,6 @@ const formatMessageTime = (dateString: string) => {
   });
 };
 
-const JOB_CHAT_MESSAGES_QUERY = gql`
-  query JobChatMessages($jobId: Int!) {
-    jobChatMessages(jobId: $jobId) {
-      id
-      content
-      createdAt
-      createdByUserId
-      createdByUser {
-        id
-        name
-      }
-    }
-  }
-`;
-
-const CREATE_JOB_CHAT_MESSAGE_MUTATION = gql`
-  mutation CreateJobChatMessage($input: CreateJobChatMessageInput!) {
-    createJobChatMessage(input: $input) {
-      data {
-        id
-        content
-        createdAt
-        createdByUserId
-        createdByUser {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
-
-type JobChatMessage = {
-  id: number;
-  content: string;
-  createdAt: string;
-  createdByUserId: number;
-  createdByUser: {
-    id: number;
-    name: string;
-  };
-};
-
-type JobChatMessagesQueryResponse = {
-  jobChatMessages: JobChatMessage[];
-};
-
-type CreateJobChatMessageMutationResponse = {
-  createJobChatMessage: {
-    data: JobChatMessage;
-  };
-};
-
 interface JobChatProps {
   jobId: number;
 }
@@ -82,16 +29,9 @@ export function JobChat({ jobId }: JobChatProps) {
   const { user } = useAuth();
   const { showErrorToast } = useToast();
 
-  const { data, loading, error, refetch } =
-    useQuery<JobChatMessagesQueryResponse>(JOB_CHAT_MESSAGES_QUERY, {
-      variables: { jobId },
-      fetchPolicy: "network-only",
-    });
+  const { messages, loading, error, refetch } = useJobChatMessages(jobId);
 
-  const [createMessage, { loading: creatingMessage }] =
-    useMutation<CreateJobChatMessageMutationResponse>(
-      CREATE_JOB_CHAT_MESSAGE_MUTATION,
-    );
+  const { createMessage, loading: creatingMessage } = useCreateJobChatMessage();
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -101,13 +41,13 @@ export function JobChat({ jobId }: JobChatProps) {
   };
 
   useEffect(() => {
-    if (data?.jobChatMessages) {
+    if (messages.length > 0) {
       const timer = setTimeout(() => {
         scrollToBottom();
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [data?.jobChatMessages]);
+  }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,12 +55,8 @@ export function JobChat({ jobId }: JobChatProps) {
 
     try {
       await createMessage({
-        variables: {
-          input: {
-            content: message.trim(),
-            jobId,
-          },
-        },
+        content: message.trim(),
+        jobId,
       });
       setMessage("");
       void refetch();
@@ -176,7 +112,6 @@ export function JobChat({ jobId }: JobChatProps) {
     }
   };
 
-  const messages = data?.jobChatMessages ?? [];
   const currentUserId = user?.id;
 
   return (

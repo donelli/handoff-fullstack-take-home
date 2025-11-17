@@ -8,7 +8,7 @@ import {
   type IDatasource,
   type IGetRowsParams,
 } from "ag-grid-community";
-import { useApolloClient, gql } from "@apollo/client";
+import { useApolloClient } from "@apollo/client";
 import Link from "next/link";
 import styles from "./ContractorHome.module.css";
 import { Button } from "~/foundation/Button";
@@ -17,46 +17,9 @@ import { useRouter } from "next/navigation";
 import { JobStatusBadge } from "../shared/JobStatusBadge";
 import { useUserContext } from "~/hooks/useUserContext";
 import { MdAdd } from "react-icons/md";
+import { loadJobs, type JobListItem } from "~/hooks/api";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-const LOAD_JOBS_QUERY = gql`
-  query LoadJobs($page: Int, $limit: Int) {
-    jobs(filter: { page: $page, limit: $limit }) {
-      page
-      limit
-      total
-      data {
-        id
-        description
-        location
-        cost
-        status
-        createdAt
-        updatedAt
-      }
-    }
-  }
-`;
-
-type LoadJobsJobModel = {
-  id: number;
-  description: string;
-  location: string;
-  cost: number;
-  status: JobStatus;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type LoadJobsQuery = {
-  jobs: {
-    page: number;
-    limit: number;
-    total: number;
-    data: LoadJobsJobModel[];
-  };
-};
 
 export const ContractorHome = () => {
   const router = useRouter();
@@ -82,16 +45,9 @@ export const ContractorHome = () => {
 
         void (async () => {
           try {
-            const result = await apolloClient.query<LoadJobsQuery>({
-              query: LOAD_JOBS_QUERY,
-              variables: { page, limit },
-              fetchPolicy: "network-only",
-            });
+            const result = await loadJobs(apolloClient, { page, limit });
 
-            const jobs = result.data?.jobs?.data ?? [];
-            const total = result.data?.jobs?.total ?? 0;
-
-            params.successCallback(jobs, total);
+            params.successCallback(result.jobs, result.pagination.total);
           } catch {
             params.failCallback();
           }
@@ -118,15 +74,13 @@ export const ContractorHome = () => {
     }
   }, [paginationPageSize]);
 
-  const colDefs = useMemo<ColDef<LoadJobsJobModel>[]>(
+  const colDefs = useMemo<ColDef<JobListItem>[]>(
     () => [
       { field: "id", headerName: "#", resizable: false, flex: 0.3 },
       {
         field: "description",
         headerName: "Description",
-        cellRenderer: (
-          params: ValueFormatterParams<LoadJobsJobModel, string>,
-        ) => (
+        cellRenderer: (params: ValueFormatterParams<JobListItem, string>) => (
           <Link
             href={`/jobs/${params.data?.id ?? ""}`}
             className={styles.jobLink}
@@ -139,9 +93,8 @@ export const ContractorHome = () => {
       {
         field: "status",
         headerName: "Status",
-        cellRenderer: (
-          params: ValueFormatterParams<LoadJobsJobModel, JobStatus>,
-        ) => (params.value ? <JobStatusBadge status={params.value} /> : "-"),
+        cellRenderer: (params: ValueFormatterParams<JobListItem, JobStatus>) =>
+          params.value ? <JobStatusBadge status={params.value} /> : "-",
       },
       {
         field: "cost",

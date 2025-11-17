@@ -4,8 +4,8 @@ import { gql } from "graphql-tag";
 import type { User } from "~/models/user";
 import { useAuth } from "~/providers/auth-provider";
 
-const QUERY = gql`
-  mutation Mutation($input: LoginInput!) {
+const LOGIN_MUTATION = gql`
+  mutation Login($input: LoginInput!) {
     login(input: $input) {
       ... on LoginSuccess {
         token
@@ -31,10 +31,11 @@ type LoginResponse = {
       }
     | {
         code: string;
+        message: string;
       };
 };
 
-export class MutationError extends Error {
+export class LoginError extends Error {
   constructor(private readonly errors: readonly GraphQLFormattedError[]) {
     super(errors[0]?.message);
   }
@@ -44,11 +45,12 @@ export class MutationError extends Error {
   }
 }
 
-export function useDoLogin() {
-  const [doLoginMutation, { loading }] = useMutation<LoginResponse>(QUERY);
+export function useLogin() {
+  const [doLoginMutation, { loading }] =
+    useMutation<LoginResponse>(LOGIN_MUTATION);
   const { login } = useAuth();
 
-  const doLogin = async (username: string, password: string) => {
+  const loginUser = async (username: string, password: string) => {
     const result = await doLoginMutation({
       variables: {
         input: {
@@ -72,7 +74,7 @@ export function useDoLogin() {
   };
 
   return {
-    doLogin,
+    login: loginUser,
     loading,
   };
 }

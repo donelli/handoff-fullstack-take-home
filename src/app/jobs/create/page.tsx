@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
-import { gql, useMutation } from "@apollo/client";
 import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
 import {
   JobForm,
@@ -10,44 +9,20 @@ import {
   type JobFormData,
 } from "~/components/shared/JobForm";
 import { useToast } from "~/foundation/hooks/useToast";
-
-const CREATE_JOB_MUTATION = gql`
-  mutation CreateJob($input: CreateJobInput!) {
-    createJob(input: $input) {
-      data {
-        id
-      }
-    }
-  }
-`;
-
-type CreateJobMutationResponse = {
-  createJob: {
-    data: {
-      id: number;
-    };
-  };
-};
+import { useCreateJob } from "~/hooks/api";
 
 export default function CreateJobPage() {
   const formRef = useRef<JobFormRef>(null);
   const router = useRouter();
   const { showErrorToast } = useToast();
-  const [createJob, { loading }] =
-    useMutation<CreateJobMutationResponse>(CREATE_JOB_MUTATION);
+  const { createJob, loading } = useCreateJob();
 
   const handleSubmit = async (data: JobFormData) => {
     try {
-      const result = await createJob({
-        variables: {
-          input: data,
-        },
-      });
+      const result = await createJob(data);
 
-      const id = result.data?.createJob.data?.id;
-
-      if (id) {
-        router.replace(`/jobs/${id}`);
+      if (result?.id) {
+        router.replace(`/jobs/${result.id}`);
       } else {
         showErrorToast("An unexpected error occurred!");
       }

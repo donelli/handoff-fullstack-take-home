@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import styles from "./index.module.css";
 import { Button } from "~/foundation/Button";
 import { TextBox } from "~/foundation/TextBox";
-import { useDoLogin } from "~/hooks/useDoLogin";
+import { useLogin } from "~/hooks/api";
 import { useRouter } from "next/navigation";
 import { useToast } from "~/foundation/hooks/useToast";
 
@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { doLogin } = useDoLogin();
+  const { login: doLogin } = useLogin();
   const router = useRouter();
   const { showErrorToast } = useToast();
 

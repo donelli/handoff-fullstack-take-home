@@ -4,12 +4,11 @@ import { useParams, useRouter } from "next/navigation";
 import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
 import { InfoField } from "~/foundation/InfoField";
 import { JobChat } from "~/components/shared/JobChat";
-import { useQuery, gql, useMutation } from "@apollo/client";
 import { useUserContext } from "~/hooks/useUserContext";
 import { JobStatus } from "~/models/job";
 import { Spinner } from "~/foundation/Spinner";
 import { useToast } from "~/foundation/hooks/useToast";
-import { UserType, type User } from "~/models/user";
+import { UserType } from "~/models/user";
 import { HomeownersList } from "~/components/shared/HomeownersList";
 import { StatusToggle } from "~/foundation/StatusToggle";
 import { ConfirmationDialog } from "~/foundation/ConfirmationDialog";
@@ -26,70 +25,7 @@ import {
 import { useAuth } from "~/providers/auth-provider";
 import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
 import styles from "./index.module.css";
-
-const JOB_QUERY = gql`
-  query GetJob($id: Int!) {
-    job(id: $id) {
-      id
-      description
-      location
-      cost
-      status
-      createdAt
-      updatedAt
-      createdByUser {
-        id
-        name
-      }
-      homeowners {
-        id
-        name
-      }
-    }
-  }
-`;
-
-type JobData = {
-  id: number;
-  description: string;
-  location: string;
-  cost: number;
-  status: JobStatus;
-  createdAt: string;
-  updatedAt: string;
-  createdByUser: User;
-  homeowners: User[];
-};
-
-type JobQueryResponse = {
-  job: JobData | null;
-};
-
-const CHANGE_JOB_STATUS_MUTATION = gql`
-  mutation ChangeJobStatus($id: Int!, $status: JobStatus!) {
-    changeJobStatus(id: $id, status: $status) {
-      data {
-        id
-      }
-    }
-  }
-`;
-
-type ChangeJobStatusMutationResponse = {
-  changeJobStatus: {
-    data: JobData;
-  };
-};
-
-const DELETE_JOB_MUTATION = gql`
-  mutation DeleteJob($id: Int!) {
-    deleteJob(id: $id)
-  }
-`;
-
-type DeleteJobMutationResponse = {
-  deleteJob: boolean;
-};
+import { useJob, useChangeJobStatus, useDeleteJob } from "~/hooks/api";
 
 export default function JobDetailsPage() {
   const params = useParams();
@@ -98,31 +34,19 @@ export default function JobDetailsPage() {
   const { formatDate, formatCurrency } = useUserContext();
   const { showErrorToast, showSuccessToast } = useToast();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [changeJobStatus, { loading: changeJobStatusLoading }] =
-    useMutation<ChangeJobStatusMutationResponse>(CHANGE_JOB_STATUS_MUTATION);
-  const [deleteJob, { loading: deleteJobLoading }] =
-    useMutation<DeleteJobMutationResponse>(DELETE_JOB_MUTATION);
+  const { changeJobStatus, loading: changeJobStatusLoading } =
+    useChangeJobStatus();
+  const { deleteJob, loading: deleteJobLoading } = useDeleteJob();
   const { user } = useAuth();
   const isContractor = user?.type === UserType.CONTRACTOR;
 
-  const { data, loading, error, refetch } = useQuery<JobQueryResponse>(
-    JOB_QUERY,
-    {
-      variables: { id: jobId },
-      fetchPolicy: "network-only",
-      onError: () => {
-        showErrorToast("Failed to load job details");
-      },
-    },
-  );
+  const { job, loading, error, refetch } = useJob(jobId);
 
   const handleChangeJobStatus = async (status: JobStatus) => {
     try {
-      const result = await changeJobStatus({
-        variables: { id: jobId, status },
-      });
+      const result = await changeJobStatus(jobId, status);
 
-      if (result.data?.changeJobStatus.data) {
+      if (result) {
         showSuccessToast("Job status changed successfully");
         void refetch();
       }
@@ -134,11 +58,9 @@ export default function JobDetailsPage() {
 
   const handleDeleteJob = async () => {
     try {
-      const result = await deleteJob({
-        variables: { id: jobId },
-      });
+      const result = await deleteJob(jobId);
 
-      if (result.data?.deleteJob) {
+      if (result) {
         showSuccessToast("Job deleted successfully");
         router.push("/");
       }
@@ -163,11 +85,9 @@ export default function JobDetailsPage() {
     return <ErrorPage />;
   }
 
-  if (!data?.job) {
+  if (!job) {
     return <NotFoundPage />;
   }
-
-  const job = data.job;
 
   return (
     <>

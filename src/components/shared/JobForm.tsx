@@ -14,7 +14,7 @@ import {
   Autocomplete,
   type AutocompleteOption,
 } from "~/foundation/Autocomplete";
-import { useUsers } from "~/hooks/useUsers";
+import { useUsers } from "~/hooks/api";
 import type { User } from "~/models/user";
 
 export type JobFormData = {

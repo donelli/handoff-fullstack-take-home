@@ -25,9 +25,10 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 
-    jobsAsHomeowner Job[] @relation("JobHomeowners")
-    jobsCreated     Job[] @relation("JobCreatedBy")
-    jobsDeleted     Job[] @relation("JobDeletedBy")
+    jobsAsHomeowner Job[]            @relation("JobHomeowners")
+    jobsCreated     Job[]            @relation("JobCreatedBy")
+    jobsDeleted     Job[]            @relation("JobDeletedBy")
+    messagesCreated JobChatMessage[] @relation("JobChatMessageCreatedBy")
 }
 
 enum JobStatus {
@@ -55,4 +56,16 @@ model Job {
     deletedAt       DateTime?
     deletedByUserId Int?
     deletedBy       User?     @relation("JobDeletedBy", fields: [deletedByUserId], references: [id])
+
+    messages JobChatMessage[]
+}
+
+model JobChatMessage {
+    id              Int      @id @default(autoincrement())
+    jobId           Int
+    job             Job      @relation(fields: [jobId], references: [id])
+    content         String
+    createdAt       DateTime @default(now())
+    createdByUserId Int
+    createdBy       User     @relation("JobChatMessageCreatedBy", fields: [createdByUserId], references: [id])
 }

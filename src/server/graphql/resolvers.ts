@@ -9,15 +9,21 @@ import type { UsersService } from "../service/users/users.service";
 import type { RequestContext } from "../request_context";
 import { buildDataLoaders } from "./dataloaders";
 import type { JobModel, JobStatus } from "~/models/job";
+import type {
+  CreateJobChatMessagePayload,
+  JobChatMessageService,
+} from "../service/job_chat_message/job_chat_message.service";
 
 export type ResolverDependencies = {
   authService: AuthService;
   usersService: UsersService;
   jobsService: JobsService;
+  jobChatMessageService: JobChatMessageService;
 };
 
 export function buildResolvers(dependencies: ResolverDependencies) {
-  const { authService, usersService, jobsService } = dependencies;
+  const { authService, usersService, jobsService, jobChatMessageService } =
+    dependencies;
 
   const dataLoaders = buildDataLoaders(dependencies);
 
@@ -49,6 +55,15 @@ export function buildResolvers(dependencies: ResolverDependencies) {
           }),
         );
       },
+      jobChatMessages: (
+        _: unknown,
+        { jobId }: { jobId: number },
+        context: RequestContext,
+      ) => {
+        return adaptServiceCall(() =>
+          jobChatMessageService.loadAllByJobId({ jobId, context }),
+        );
+      },
     },
     Job: {
       createdByUser: (
@@ -73,6 +88,24 @@ export function buildResolvers(dependencies: ResolverDependencies) {
         return adaptServiceCall(() =>
           usersService.loadHomeownersByJobId(parent.id),
         );
+      },
+      jobChatMessages: (
+        parent: JobModel,
+        _: unknown,
+        context: RequestContext,
+      ) => {
+        return adaptServiceCall(() =>
+          jobChatMessageService.loadAllByJobId({ jobId: parent.id, context }),
+        );
+      },
+    },
+    JobChatMessage: {
+      createdByUser: (
+        parent: { createdByUserId: number },
+        _: unknown,
+        context: RequestContext,
+      ) => {
+        return dataLoaders.users(context).load(parent.createdByUserId);
       },
     },
     Mutation: {
@@ -131,6 +164,15 @@ export function buildResolvers(dependencies: ResolverDependencies) {
           return jobsService.changeStatus({ id, status, context });
         });
       },
+      createJobChatMessage: (
+        _: unknown,
+        { input }: { input: CreateJobChatMessageInput },
+        context: RequestContext,
+      ) => {
+        return adaptServiceCall(() => {
+          return jobChatMessageService.create({ ...input, context });
+        });
+      },
     },
   };
 }
@@ -166,4 +208,9 @@ type CreateJobInput = Pick<
 type UpdateJobInput = Pick<
   UpdateJobPayload,
   "description" | "cost" | "location" | "homeownerIds"
+>;
+
+type CreateJobChatMessageInput = Pick<
+  CreateJobChatMessagePayload,
+  "content" | "jobId"
 >;

@@ -87,23 +87,28 @@ export class AuthService {
     }
 
     if (!authorizationHeader.startsWith("Bearer ")) {
-      throw new ProtectedRouteError();
+      return undefined;
     }
 
     const token = authorizationHeader.substring(7);
 
-    const decodedJwt = jwt.verify(token, env.JWT_SECRET) as {
-      userId: number;
-      userType: string;
-      username: string;
-    };
+    try {
+      const decodedJwt = jwt.verify(token, env.JWT_SECRET) as {
+        userId: number;
+        userType: string;
+        username: string;
+      };
 
-    // FIXME: Load user from database to ensure we get the most updated data
+      // FIXME: Load user from database to ensure we get the most updated data
 
-    return {
-      id: decodedJwt.userId,
-      type: decodedJwt.userType as UserType,
-    };
+      return {
+        id: decodedJwt.userId,
+        type: decodedJwt.userType as UserType,
+      };
+    } catch (error) {
+      console.error("Error parsing and validating token", error);
+      return undefined;
+    }
   }
 
   async loadMe(context: RequestContext) {

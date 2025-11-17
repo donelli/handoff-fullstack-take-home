@@ -1,13 +1,6 @@
 import { gql } from "graphql-tag";
 
 export const typeDefs = gql`
-  type Query {
-    users: [User!]!
-    jobs(filter: JobsFilterInput!): LoadJobsResult!
-    job(id: Int!): Job
-    me: User!
-  }
-
   type LoadJobsResult {
     page: Int!
     limit: Int!
@@ -36,6 +29,7 @@ export const typeDefs = gql`
     deletedByUserId: Int
     deletedByUser: User
     homeowners: [User!]
+    jobChatMessages: [JobChatMessage!]!
   }
 
   enum UserType {
@@ -73,6 +67,14 @@ export const typeDefs = gql`
     CANCELED
   }
 
+  type JobChatMessage {
+    id: Int!
+    content: String!
+    createdAt: String!
+    createdByUserId: Int!
+    createdByUser: User!
+  }
+
   input CreateJobInput {
     description: String!
     location: String!
@@ -99,11 +101,31 @@ export const typeDefs = gql`
     data: Job!
   }
 
+  input CreateJobChatMessageInput {
+    content: String!
+    jobId: Int!
+  }
+
+  type CreateJobChatMessageResult {
+    data: JobChatMessage!
+  }
+
+  type Query {
+    users: [User!]!
+    jobs(filter: JobsFilterInput!): LoadJobsResult!
+    job(id: Int!): Job
+    me: User!
+    jobChatMessages(jobId: Int!): [JobChatMessage!]!
+  }
+
   type Mutation {
     login(input: LoginInput!): LoginResult!
     createJob(input: CreateJobInput!): CreateJobResult!
     updateJob(id: Int!, input: UpdateJobInput!): UpdateJobResult!
     deleteJob(id: Int!): Boolean!
     changeJobStatus(id: Int!, status: JobStatus!): ChangeJobStatusResult!
+    createJobChatMessage(
+      input: CreateJobChatMessageInput!
+    ): CreateJobChatMessageResult!
   }
 `;

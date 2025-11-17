@@ -1,12 +1,21 @@
 .button {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-sm);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
     transition: background-color 0.2s;
+}
+
+.buttonMedium {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-sm);
+}
+
+.buttonSmall {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-sm);
+    font-size: var(--font-size-xs);
 }
 
 .buttonPrimary {
@@ -21,5 +30,20 @@
 
 .buttonDanger:hover {
     background-color: #dc2626;
+}
+
+.buttonOutline {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: var(--border-size-sm) solid var(--card-border-color);
+}
+
+.buttonOutline:hover:not(:disabled) {
+    background-color: var(--gray-100);
+}
+
+.buttonOutline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 

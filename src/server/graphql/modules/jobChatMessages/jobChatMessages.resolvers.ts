@@ -32,7 +32,10 @@ export function buildJobChatMessagesResolvers({
         context: RequestContext,
       ) => {
         return adaptServiceCall(() =>
-          jobChatMessageService.loadAllByJobId({ jobId: parent.id, context }),
+          jobChatMessageService.loadAllByJobId({
+            jobId: parent.id,
+            context,
+          }),
         );
       },
     },

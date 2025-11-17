@@ -28,7 +28,9 @@ export function DetailsPageLayout(props: DetailsPageLayoutProps) {
           <MdChevronLeft size={16} />
         </button>
         <h1 className={styles.title}>{title}</h1>
-        {headerAction && <div className={styles.headerAction}>{headerAction}</div>}
+        {headerAction && (
+          <div className={styles.headerAction}>{headerAction}</div>
+        )}
       </header>
       <div className={styles.body}>{children}</div>
       {footerAction && (

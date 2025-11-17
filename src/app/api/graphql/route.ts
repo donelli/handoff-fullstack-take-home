@@ -1,5 +1,5 @@
 import { startGraphqlAndGetNextHandler } from "~/server/server";
 
-const handler = startGraphqlAndGetNextHandler()
+const handler = startGraphqlAndGetNextHandler();
 
 export { handler as GET, handler as POST };

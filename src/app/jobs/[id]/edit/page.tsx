@@ -26,7 +26,11 @@ export default function EditJobPage() {
     return (
       <DetailsPageLayout title="Edit Job">
         <div
-          style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "2rem",
+          }}
         >
           <Spinner />
         </div>

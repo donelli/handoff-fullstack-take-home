@@ -20,4 +20,3 @@ export function InfoField(props: InfoFieldProps) {
     </div>
   );
 }
-

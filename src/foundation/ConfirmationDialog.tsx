@@ -50,4 +50,3 @@ export function ConfirmationDialog(props: ConfirmationDialogProps) {
     </div>
   );
 }
-

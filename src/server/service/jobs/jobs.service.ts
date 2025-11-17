@@ -51,6 +51,10 @@ export class JobsService {
     const limit = payload.limit ?? 20;
     const page = payload.page ?? 1;
 
+    if (limit > 200) {
+      limit = 200;
+    }
+
     if (!context.userData) {
       throw new ProtectedRouteError();
     }

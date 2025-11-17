@@ -11,6 +11,7 @@ import type { RequestContext } from "~/server/request_context";
 type LoadJobsPayload = {
   limit?: number;
   page?: number;
+  status?: JobStatus[];
 
   context: RequestContext;
 };
@@ -46,7 +47,7 @@ export class JobsService {
   constructor(private readonly jobsRepository: JobsRepository) {}
 
   async loadBasedOnUser(payload: LoadJobsPayload) {
-    const { context } = payload;
+    const { context, status } = payload;
     const limit = payload.limit ?? 20;
     const page = payload.page ?? 1;
 
@@ -68,6 +69,7 @@ export class JobsService {
       page,
       createdByUserId,
       homeownerId,
+      status,
     });
 
     return result;

@@ -9,10 +9,9 @@ export const typeDefs = gql`
   }
 
   input JobsFilterInput {
-    createdByUserId: Int
-    homeownerId: Int
     page: Int
     limit: Int
+    status: [JobStatus!]
   }
 
   type Job {

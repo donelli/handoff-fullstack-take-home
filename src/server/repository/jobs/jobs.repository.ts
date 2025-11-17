@@ -12,6 +12,7 @@ type LoadJobsPayload = {
   homeownerId?: number;
   limit: number;
   page: number;
+  status?: JobStatus[];
 };
 
 type LoadJobsResult = {
@@ -48,7 +49,7 @@ export class JobsRepository {
   constructor(private readonly db: DbClient) {}
 
   async load(payload: LoadJobsPayload): Promise<LoadJobsResult> {
-    const { limit, page, homeownerId, createdByUserId } = payload;
+    const { limit, page, homeownerId, createdByUserId, status } = payload;
 
     const where: Prisma.JobFindManyArgs["where"] = {
       deletedAt: {
@@ -69,6 +70,12 @@ export class JobsRepository {
     if (createdByUserId) {
       where.createdByUserId = {
         equals: createdByUserId,
+      };
+    }
+
+    if (status) {
+      where.status = {
+        in: status,
       };
     }
 

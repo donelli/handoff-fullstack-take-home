@@ -198,6 +198,7 @@ function adaptServiceCall<R, C extends () => R>(
 type LoadJobsFilter = {
   page?: number;
   limit?: number;
+  status?: JobStatus[];
 };
 
 type CreateJobInput = Pick<

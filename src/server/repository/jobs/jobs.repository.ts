@@ -131,11 +131,12 @@ export class JobsRepository {
         location,
         updatedAt: new Date(),
         status,
-        homeowners: homeownerIds?.length
-          ? {
-              connect: homeownerIds.map((id) => ({ id })),
-            }
-          : undefined,
+        homeowners:
+          homeownerIds !== undefined
+            ? {
+                set: homeownerIds.map((id) => ({ id })),
+              }
+            : undefined,
       },
     });
 

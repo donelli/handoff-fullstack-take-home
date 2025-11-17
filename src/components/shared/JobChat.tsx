@@ -29,7 +29,8 @@ export function JobChat({ jobId }: JobChatProps) {
   const { user } = useAuth();
   const { showErrorToast } = useToast();
 
-  const { messages, loading, error, refetch } = useJobChatMessages(jobId);
+  const { messages, loading, error, refetch, startPolling, stopPolling } =
+    useJobChatMessages(jobId);
 
   const { createMessage, loading: creatingMessage } = useCreateJobChatMessage();
 
@@ -39,6 +40,12 @@ export function JobChat({ jobId }: JobChatProps) {
         messagesContainerRef.current.scrollHeight;
     }
   };
+
+  useEffect(() => {
+    const POLLING_INTERVAL_MS = 2000;
+    startPolling(POLLING_INTERVAL_MS);
+    return () => stopPolling();
+  }, [startPolling, stopPolling]);
 
   useEffect(() => {
     if (messages.length > 0) {

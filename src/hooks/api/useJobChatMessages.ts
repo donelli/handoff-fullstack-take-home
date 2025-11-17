@@ -31,7 +31,7 @@ export type JobChatMessagesQueryResponse = {
 };
 
 export function useJobChatMessages(jobId: number) {
-  const { data, loading, error, refetch } =
+  const { data, loading, error, refetch, startPolling, stopPolling } =
     useQuery<JobChatMessagesQueryResponse>(JOB_CHAT_MESSAGES_QUERY, {
       variables: { jobId },
     });
@@ -41,5 +41,7 @@ export function useJobChatMessages(jobId: number) {
     loading,
     error,
     refetch,
+    startPolling,
+    stopPolling,
   };
 }

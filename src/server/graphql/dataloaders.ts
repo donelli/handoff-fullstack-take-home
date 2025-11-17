@@ -9,10 +9,21 @@ export type Dependencies = {
 
 export function buildDataLoaders(dependencies: Dependencies) {
   const { usersService } = dependencies;
+  const loadersCache = new WeakMap<RequestContext, DataLoader<number, User>>();
 
   return {
-    users: (_context: RequestContext) =>
-      new DataLoader<number, User>((ids) => usersService.loadByIds([...ids])),
+    users: (context: RequestContext) => {
+      if (!loadersCache.has(context)) {
+        loadersCache.set(
+          context,
+          new DataLoader<number, User>((ids) =>
+            usersService.loadByIds([...ids]),
+          ),
+        );
+      }
+
+      return loadersCache.get(context)!;
+    },
   };
 }
 

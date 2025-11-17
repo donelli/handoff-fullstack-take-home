@@ -3,6 +3,9 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ApolloWrapper } from "~/providers/apollo-provider";
+import { AuthProvider, AuthGate } from "~/providers/auth-provider";
+import { ToastContainer } from "react-toastify";
+import { ConditionalHeader } from "~/components/shared/ConditionalHeader";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -19,8 +22,19 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={geist.className}>
-        <ApolloWrapper>{children}</ApolloWrapper>
+      <body
+        className={geist.className}
+        style={{
+          backgroundColor: "var(--gray-100)",
+        }}
+      >
+        <ToastContainer />
+        <ApolloWrapper>
+          <AuthProvider>
+            <ConditionalHeader />
+            <AuthGate>{children}</AuthGate>
+          </AuthProvider>
+        </ApolloWrapper>
       </body>
     </html>
   );

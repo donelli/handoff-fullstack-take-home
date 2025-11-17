@@ -1,0 +1,33 @@
+.statusToggleContainer {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+  
+.statusToggleButton {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid;
+  background-color: transparent;
+  border-color: var(--card-border-color);
+}
+
+.statusToggleButtonActive {
+  font-weight: 600;
+}
+
+.statusToggleButtonSelectable {
+  cursor: pointer;
+}
+
+.statusToggleButtonSelectable:hover {
+  background-color: var(--gray-100);
+}
+
+.statusToggleLoading {
+  margin-left: var(--spacing-sm);
+}

@@ -1,0 +1,29 @@
+
+.main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.form {
+    width: 420px;
+    padding: var(--spacing-lg);
+    border: var(--border-size-sm) solid var(--card-border-color);
+    border-radius: var(--border-md);
+    background-color: var(--white);
+}
+
+.loginTitle {
+    margin: 0 0 var(--spacing-md);
+}
+
+.helpText {
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--gray-700);
+
+    ul {
+        margin-top: var(--spacing-xs);
+    }
+}

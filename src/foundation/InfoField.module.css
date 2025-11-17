@@ -1,0 +1,30 @@
+.infoFieldLabel {
+    font-weight: medium;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--gray-700);
+}
+
+.infoFieldValue {
+    padding: var(--spacing-sm);
+    border-radius: var(--border-sm);
+    font-family: inherit;
+    background-color: var(--gray-100);
+    color: var(--black);
+    min-height: 20px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.infoFieldContainer {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: var(--spacing-md);
+}
+
+.infoFieldContainerNoBackground {
+    background-color: transparent !important;
+    padding: 0;
+}
+

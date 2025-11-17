@@ -1,0 +1,120 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  border: var(--border-size-sm) solid var(--card-border-color);
+  border-radius: var(--border-md);
+  overflow: hidden;
+  height: 70vh;
+}
+
+
+@media (max-width: 768px) {
+  .container {
+    height: 90vh;
+  }
+}
+
+.header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-bottom: var(--border-size-sm) solid var(--card-border-color);
+  background-color: var(--gray-100);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.message {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--gray-100);
+  border-radius: var(--border-sm);
+  align-self: flex-start;
+  max-width: 80%;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.messageOwn {
+  background-color: var(--primary-color);
+  color: var(--primary-foreground-color);
+  align-self: flex-end;
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+  gap: var(--spacing-sm);
+}
+
+.messageSender {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+.messageOwn .messageSender {
+  color: var(--primary-foreground-color);
+  opacity: 0.9;
+}
+
+.messageTime {
+  font-size: var(--font-size-xs);
+  color: var(--gray-700);
+  opacity: 0.7;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.messageOwn .messageTime {
+  color: var(--primary-foreground-color);
+  opacity: 0.7;
+}
+
+.messageContent {
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+.inputContainer {
+  background-color: var(--white);
+  border-top: var(--border-size-sm) solid var(--card-border-color);
+  width: 100%;
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  padding-bottom: 0;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  border: none;
+  padding: var(--spacing-sm);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  resize: none;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.chatHelpText {
+  font-size: var(--font-size-xs);
+  color: var(--gray-700);
+  padding: var(--spacing-sm);
+}

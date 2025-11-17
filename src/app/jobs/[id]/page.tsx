@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { DetailsPageLayout } from "~/components/shared/DetailsPageLayout";
 import { InfoField } from "~/foundation/InfoField";
-import { Chat } from "~/components/shared/Chat";
+import { JobChat } from "~/components/shared/JobChat";
 import { useQuery, gql, useMutation } from "@apollo/client";
 import { useUserContext } from "~/hooks/useUserContext";
 import { JobStatus } from "~/models/job";
@@ -320,7 +320,7 @@ export default function JobDetailsPage() {
             <InfoField label="Created At" value={formatDate(job.createdAt)} />
           </div>
           <div style={{ flex: "0 0 40%", height: "100%" }}>
-            <Chat />
+            <JobChat jobId={jobId} />
           </div>
         </div>
       </DetailsPageLayout>

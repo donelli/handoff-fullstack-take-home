@@ -34,6 +34,8 @@
   border-radius: var(--border-sm);
   align-self: flex-start;
   max-width: 80%;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .messageOwn {
@@ -80,21 +82,32 @@
 }
 
 .inputContainer {
-  padding: var(--spacing-md);
-  border-top: var(--border-size-sm) solid var(--card-border-color);
   background-color: var(--white);
+  border-top: var(--border-size-sm) solid var(--card-border-color);
+  width: 100%;
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  padding-bottom: 0;
+  align-items: center;
 }
 
 .input {
   width: 100%;
-  border: var(--border-size-sm) solid var(--card-border-color);
+  border: none;
   padding: var(--spacing-sm);
-  border-radius: var(--border-sm);
   font-family: inherit;
   font-size: var(--font-size-sm);
+  resize: none;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary-color);
+}
+
+.chatHelpText {
+  font-size: var(--font-size-xs);
+  color: var(--gray-700);
+  padding: var(--spacing-sm);
 }

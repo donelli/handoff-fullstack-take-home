@@ -9,6 +9,14 @@
   margin-top: var(--spacing-md);
 }
 
+@media (max-width: 768px) {
+  .container {
+    margin-top: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -49,6 +57,13 @@
 .body {
   flex: 1;
   padding: var(--spacing-lg);
+}
+
+
+@media (max-width: 768px) {
+  .body {
+    padding: var(--spacing-md) !important;
+  }
 }
 
 .footer {

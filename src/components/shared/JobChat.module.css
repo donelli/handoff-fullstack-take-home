@@ -7,6 +7,13 @@
   height: 70vh;
 }
 
+
+@media (max-width: 768px) {
+  .container {
+    height: 90vh;
+  }
+}
+
 .header {
   padding: var(--spacing-sm) var(--spacing-md);
   border-bottom: var(--border-size-sm) solid var(--card-border-color);

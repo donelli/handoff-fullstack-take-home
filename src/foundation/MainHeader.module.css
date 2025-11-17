@@ -39,3 +39,14 @@
   justify-content: center;
 }
 
+
+@media (max-width: 768px) {
+  .header {
+    padding: var(--spacing-sm) !important;
+    padding-left: var(--spacing-md) !important;
+  }
+
+  .userName {
+    display: none;
+  }
+}

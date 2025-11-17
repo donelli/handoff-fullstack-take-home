@@ -9,7 +9,7 @@ import { useUserContext } from "~/hooks/useUserContext";
 import { JobStatus } from "~/models/job";
 import { Spinner } from "~/foundation/Spinner";
 import { useToast } from "~/foundation/hooks/useToast";
-import { type User } from "~/models/user";
+import { UserType, type User } from "~/models/user";
 import { HomeownersList } from "~/components/shared/HomeownersList";
 import { StatusToggle } from "~/foundation/StatusToggle";
 import { ConfirmationDialog } from "~/foundation/ConfirmationDialog";
@@ -23,6 +23,9 @@ import {
   MdDeleteOutline,
   MdModeEdit,
 } from "react-icons/md";
+import { useAuth } from "~/providers/auth-provider";
+import { JobStatusBadge } from "~/components/shared/JobStatusBadge";
+import styles from "./index.module.css";
 
 const JOB_QUERY = gql`
   query GetJob($id: Int!) {
@@ -99,6 +102,8 @@ export default function JobDetailsPage() {
     useMutation<ChangeJobStatusMutationResponse>(CHANGE_JOB_STATUS_MUTATION);
   const [deleteJob, { loading: deleteJobLoading }] =
     useMutation<DeleteJobMutationResponse>(DELETE_JOB_MUTATION);
+  const { user } = useAuth();
+  const isContractor = user?.type === UserType.CONTRACTOR;
 
   const { data, loading, error, refetch } = useQuery<JobQueryResponse>(
     JOB_QUERY,
@@ -147,9 +152,7 @@ export default function JobDetailsPage() {
   if (loading) {
     return (
       <DetailsPageLayout title="Job Details">
-        <div
-          style={{ display: "flex", justifyContent: "center", padding: "2rem" }}
-        >
+        <div className={styles.spinnerContainer}>
           <Spinner />
         </div>
       </DetailsPageLayout>
@@ -157,53 +160,11 @@ export default function JobDetailsPage() {
   }
 
   if (error) {
-    return (
-      <DetailsPageLayout title="Job Details">
-        <div
-          style={{
-            padding: "2rem",
-            textAlign: "center",
-            backgroundColor: "#fee",
-            border: "1px solid #fcc",
-            borderRadius: "8px",
-            color: "#c33",
-          }}
-        >
-          <h2 style={{ marginBottom: "1rem", fontSize: "1.5rem" }}>
-            Error Loading Job
-          </h2>
-          <p style={{ margin: 0 }}>
-            An error occurred while loading the job details. Please try again
-            later.
-          </p>
-        </div>
-      </DetailsPageLayout>
-    );
+    return <ErrorPage />;
   }
 
   if (!data?.job) {
-    return (
-      <DetailsPageLayout title="Job Details">
-        <div
-          style={{
-            padding: "2rem",
-            textAlign: "center",
-            backgroundColor: "#f9f9f9",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            color: "#666",
-          }}
-        >
-          <h2 style={{ marginBottom: "1rem", fontSize: "1.5rem" }}>
-            Job Not Found
-          </h2>
-          <p style={{ margin: 0 }}>
-            The job you&apos;re looking for doesn&apos;t exist or has been
-            removed.
-          </p>
-        </div>
-      </DetailsPageLayout>
-    );
+    return <NotFoundPage />;
   }
 
   const job = data.job;
@@ -223,78 +184,35 @@ export default function JobDetailsPage() {
       <DetailsPageLayout
         title="Job Details"
         headerAction={
-          <div style={{ display: "flex", gap: "var(--spacing-sm)" }}>
-            <Button
-              onClick={() => router.push(`/jobs/${jobId}/edit`)}
-              type="button"
-              variant="primary"
-            >
-              <MdModeEdit size={16} />
-              Edit
-            </Button>
-            <Button
-              onClick={() => setShowDeleteConfirm(true)}
-              type="button"
-              variant="danger"
-            >
-              <MdDeleteOutline size={16} />
-              Delete
-            </Button>
-          </div>
+          isContractor && (
+            <div className={styles.headerActions}>
+              <Button
+                onClick={() => router.push(`/jobs/${jobId}/edit`)}
+                type="button"
+                variant="primary"
+              >
+                <MdModeEdit size={16} />
+                Edit
+              </Button>
+              <Button
+                onClick={() => setShowDeleteConfirm(true)}
+                type="button"
+                variant="danger"
+              >
+                <MdDeleteOutline size={16} />
+                Delete
+              </Button>
+            </div>
+          )
         }
       >
-        <div
-          style={{ display: "flex", gap: "var(--spacing-lg)", height: "100%" }}
-        >
-          <div style={{ flex: "1 1 70%" }}>
-            <InfoField
-              label="Status"
-              noBackground
-              value={
-                <StatusToggle
-                  loading={changeJobStatusLoading}
-                  value={job.status}
-                  onChange={handleChangeJobStatus}
-                  options={[
-                    {
-                      label: "Planning",
-                      value: JobStatus.PLANNING,
-                      icon: (color: string) => (
-                        <MdOutlineFilterTiltShift color={color} size={16} />
-                      ),
-                      color: "var(--orange-500)",
-                      selectedBackgroundColor: "var(--orange-100)",
-                    },
-                    {
-                      label: "In Progress",
-                      value: JobStatus.IN_PROGRESS,
-                      icon: (color: string) => (
-                        <MdOutlineBuildCircle color={color} size={16} />
-                      ),
-                      color: "var(--blue-500)",
-                      selectedBackgroundColor: "var(--blue-100)",
-                    },
-                    {
-                      label: "Completed",
-                      value: JobStatus.COMPLETED,
-                      icon: (color: string) => (
-                        <MdCheckCircleOutline color={color} size={16} />
-                      ),
-                      color: "var(--green-500)",
-                      selectedBackgroundColor: "var(--green-100)",
-                    },
-                    {
-                      label: "Canceled",
-                      value: JobStatus.CANCELED,
-                      icon: (color: string) => (
-                        <MdOutlineBlock color={color} size={16} />
-                      ),
-                      color: "var(--red-500)",
-                      selectedBackgroundColor: "var(--red-100)",
-                    },
-                  ]}
-                />
-              }
+        <div className={styles.mainContent}>
+          <div className={styles.leftColumn}>
+            <StatusField
+              isContractor={isContractor}
+              status={job.status}
+              changeJobStatusLoading={changeJobStatusLoading}
+              handleChangeJobStatus={handleChangeJobStatus}
             />
 
             <InfoField label="Description" value={job.description} />
@@ -303,7 +221,7 @@ export default function JobDetailsPage() {
 
             <InfoField label="Cost" value={formatCurrency(job.cost)} />
 
-            {job.homeowners && job.homeowners.length > 0 && (
+            {isContractor && job.homeowners && job.homeowners.length > 0 && (
               <InfoField
                 label="Homeowners"
                 value={<HomeownersList homeowners={job.homeowners} />}
@@ -312,14 +230,16 @@ export default function JobDetailsPage() {
 
             <InfoField label="Updated At" value={formatDate(job.updatedAt)} />
 
-            <InfoField
-              label="Created By"
-              value={<HomeownersList homeowners={[job.createdByUser]} />}
-            />
+            {isContractor && (
+              <InfoField
+                label="Created By"
+                value={<HomeownersList homeowners={[job.createdByUser]} />}
+              />
+            )}
 
             <InfoField label="Created At" value={formatDate(job.createdAt)} />
           </div>
-          <div style={{ flex: "0 0 40%", height: "100%" }}>
+          <div className={styles.rightColumn}>
             <JobChat jobId={jobId} />
           </div>
         </div>
@@ -327,3 +247,98 @@ export default function JobDetailsPage() {
     </>
   );
 }
+
+const StatusField = ({
+  isContractor,
+  status,
+  changeJobStatusLoading,
+  handleChangeJobStatus,
+}: {
+  isContractor: boolean;
+  status: JobStatus;
+  changeJobStatusLoading: boolean;
+  handleChangeJobStatus: (status: JobStatus) => void;
+}) => {
+  return (
+    <InfoField
+      label="Status"
+      noBackground={isContractor}
+      value={
+        isContractor ? (
+          <StatusToggle
+            loading={changeJobStatusLoading}
+            value={status}
+            onChange={handleChangeJobStatus}
+            options={[
+              {
+                label: "Planning",
+                value: JobStatus.PLANNING,
+                icon: (color: string) => (
+                  <MdOutlineFilterTiltShift color={color} size={16} />
+                ),
+                color: "var(--orange-500)",
+                selectedBackgroundColor: "var(--orange-100)",
+              },
+              {
+                label: "In Progress",
+                value: JobStatus.IN_PROGRESS,
+                icon: (color: string) => (
+                  <MdOutlineBuildCircle color={color} size={16} />
+                ),
+                color: "var(--blue-500)",
+                selectedBackgroundColor: "var(--blue-100)",
+              },
+              {
+                label: "Completed",
+                value: JobStatus.COMPLETED,
+                icon: (color: string) => (
+                  <MdCheckCircleOutline color={color} size={16} />
+                ),
+                color: "var(--green-500)",
+                selectedBackgroundColor: "var(--green-100)",
+              },
+              {
+                label: "Canceled",
+                value: JobStatus.CANCELED,
+                icon: (color: string) => (
+                  <MdOutlineBlock color={color} size={16} />
+                ),
+                color: "var(--red-500)",
+                selectedBackgroundColor: "var(--red-100)",
+              },
+            ]}
+          />
+        ) : (
+          <JobStatusBadge status={status} />
+        )
+      }
+    />
+  );
+};
+
+const ErrorPage = () => {
+  return (
+    <DetailsPageLayout title="Job Details">
+      <div className={styles.errorContainer}>
+        <h2 className={styles.errorHeading}>Error Loading Job</h2>
+        <p className={styles.errorParagraph}>
+          An error occurred while loading the job details. Please try again
+          later.
+        </p>
+      </div>
+    </DetailsPageLayout>
+  );
+};
+
+const NotFoundPage = () => {
+  return (
+    <DetailsPageLayout title="Job Details">
+      <div className={styles.notFoundContainer}>
+        <h2 className={styles.notFoundHeading}>Job Not Found</h2>
+      </div>
+      <p className={styles.notFoundParagraph}>
+        The job you&apos;re looking for doesn&apos;t exist or has been removed.
+      </p>
+    </DetailsPageLayout>
+  );
+};

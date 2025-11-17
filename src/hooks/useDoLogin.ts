@@ -10,6 +10,7 @@ const QUERY = gql`
       ... on LoginSuccess {
         token
         user {
+          id
           name
           type
         }

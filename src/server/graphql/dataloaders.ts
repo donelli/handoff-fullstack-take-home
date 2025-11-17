@@ -15,3 +15,5 @@ export function buildDataLoaders(dependencies: Dependencies) {
       new DataLoader<number, User>((ids) => usersService.loadByIds([...ids])),
   };
 }
+
+export type DataLoaders = ReturnType<typeof buildDataLoaders>;

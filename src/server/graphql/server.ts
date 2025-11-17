@@ -10,6 +10,14 @@ import { JobsService } from "../service/jobs/jobs.service";
 import type { RequestContext } from "../request_context";
 import { JobChatMessageRepository } from "../repository/job_chat_message/job_chat_message.repository";
 import { JobChatMessageService } from "../service/job_chat_message/job_chat_message.service";
+import { mergeTypeDefs, mergeResolvers } from "@graphql-tools/merge";
+import { usersTypeDefs, buildUsersResolvers } from "./modules/users";
+import { jobsTypeDefs, buildJobsResolvers } from "./modules/jobs";
+import { buildDataLoaders } from "./dataloaders";
+import {
+  buildJobChatMessagesResolvers,
+  jobChatMessagesTypeDefs,
+} from "./modules/jobChatMessages";
 
 export function createApolloServer() {
   const usersRepository = new UsersRepository(db);
@@ -24,13 +32,23 @@ export function createApolloServer() {
     jobsRepository,
   );
 
-  return new ApolloServer<RequestContext>({
+  const dataLoaders = buildDataLoaders({ usersService });
+
+  const mergedTypeDefs = mergeTypeDefs([
     typeDefs,
-    resolvers: buildResolvers({
-      authService,
-      usersService,
-      jobsService,
-      jobChatMessageService,
-    }),
+    usersTypeDefs,
+    jobsTypeDefs,
+    jobChatMessagesTypeDefs,
+  ]);
+  const mergedResolvers = mergeResolvers([
+    buildResolvers(),
+    buildUsersResolvers({ usersService, authService }),
+    buildJobsResolvers({ jobsService, dataLoaders, usersService }),
+    buildJobChatMessagesResolvers({ jobChatMessageService, dataLoaders }),
+  ]);
+
+  return new ApolloServer<RequestContext>({
+    typeDefs: mergedTypeDefs,
+    resolvers: mergedResolvers,
   });
 }

@@ -12,11 +12,15 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const { login: doLogin } = useLogin();
+  const { login: doLogin, loading: isLoggingIn } = useLogin();
   const router = useRouter();
   const { showErrorToast } = useToast();
 
   const handleSubmit = async () => {
+    if (isLoggingIn) {
+      return;
+    }
+
     if (!username || !password) {
       showErrorToast("Username and password are required!");
       return;
@@ -53,6 +57,7 @@ export default function LoginPage() {
           onChange={setUsername}
           placeholder="Your user name"
           label="Username"
+          readonly={isLoggingIn}
         />
 
         <TextBox
@@ -61,9 +66,12 @@ export default function LoginPage() {
           type="password"
           placeholder="••••••••"
           label="Password"
+          readonly={isLoggingIn}
         />
 
-        <Button onClick={handleSubmit}>Login</Button>
+        <Button onClick={handleSubmit} loading={isLoggingIn}>
+          Login
+        </Button>
 
         <div className={styles.helpText}>
           Use one of the following credentials to login:

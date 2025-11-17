@@ -16,7 +16,9 @@ export default function LoginPage() {
   const router = useRouter();
   const { showErrorToast } = useToast();
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+
     if (isLoggingIn) {
       return;
     }
@@ -49,7 +51,7 @@ export default function LoginPage() {
 
   return (
     <main className={styles.main}>
-      <div className={styles.form}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <h1 className={styles.loginTitle}>Handoff Take Home</h1>
 
         <TextBox
@@ -69,7 +71,7 @@ export default function LoginPage() {
           readonly={isLoggingIn}
         />
 
-        <Button onClick={handleSubmit} loading={isLoggingIn}>
+        <Button type="submit" loading={isLoggingIn}>
           Login
         </Button>
 
@@ -80,7 +82,7 @@ export default function LoginPage() {
             <li>Username: homeowner, Password: homeowner</li>
           </ul>
         </div>
-      </div>
+      </form>
     </main>
   );
 }

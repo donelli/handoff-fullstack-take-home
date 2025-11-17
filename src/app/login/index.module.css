@@ -17,3 +17,13 @@
 .loginTitle {
     margin: 0 0 var(--spacing-md);
 }
+
+.helpText {
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--gray-700);
+
+    ul {
+        margin-top: var(--spacing-xs);
+    }
+}

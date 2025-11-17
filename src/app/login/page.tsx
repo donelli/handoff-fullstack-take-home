@@ -31,7 +31,7 @@ export default function LoginPage() {
             showErrorToast("Invalid user or password!");
             break;
           default:
-            showErrorToast("An unexpected error ocurred!");
+            showErrorToast("An unexpected error occurred!");
         }
         return;
       }
@@ -39,14 +39,14 @@ export default function LoginPage() {
       void router.replace("/");
     } catch (error) {
       console.error(error);
-      showErrorToast("An unexpected error ocurred!");
+      showErrorToast("An unexpected error occurred!");
     }
   };
 
   return (
     <main className={styles.main}>
       <div className={styles.form}>
-        <h1 className={styles.loginTitle}>Login</h1>
+        <h1 className={styles.loginTitle}>Handoff Take Home</h1>
 
         <TextBox
           value={username}
@@ -63,7 +63,15 @@ export default function LoginPage() {
           label="Password"
         />
 
-        <Button onClick={handleSubmit}>Entrar</Button>
+        <Button onClick={handleSubmit}>Login</Button>
+
+        <div className={styles.helpText}>
+          Use one of the following credentials to login:
+          <ul>
+            <li>Username: contractor, Password: contractor</li>
+            <li>Username: homeowner, Password: homeowner</li>
+          </ul>
+        </div>
       </div>
     </main>
   );

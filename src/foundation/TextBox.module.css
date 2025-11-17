@@ -40,3 +40,7 @@
     font-family: inherit;
     border-right: 1px solid var(--card-border-color);
 }
+
+.required {
+    color: var(--red-500);
+}

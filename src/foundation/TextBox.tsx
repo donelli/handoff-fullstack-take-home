@@ -23,7 +23,10 @@ export function TextBox(props: TextBoxProps) {
   return (
     <div className={styles.textBoxContainer}>
       {props.label && (
-        <label className={styles.textBoxLabel}>{props.label}</label>
+        <label className={styles.textBoxLabel}>
+          {props.label}
+          {required && <span className={styles.required}> *</span>}
+        </label>
       )}
       <input
         type={type}

@@ -1,37 +1,18 @@
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  vi,
-  type MockedFunction,
-} from "vitest";
+/* eslint-disable @typescript-eslint/unbound-method */
+import { describe, it, expect, beforeEach } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 import { UsersRepository } from "./users.repository";
 import type { DbClient } from "~/server/db";
 import type { User as PrismaUser } from "generated/prisma";
 import { UserType } from "~/models/user";
 
 describe("UsersRepository", () => {
-  let mockDb: {
-    user: {
-      findMany: MockedFunction<
-        (args?: { where?: { id?: { in: number[] } } }) => Promise<PrismaUser[]>
-      >;
-      findFirst: MockedFunction<
-        (args?: { where?: { id: number } }) => Promise<PrismaUser | null>
-      >;
-    };
-  };
+  let mockDb: ReturnType<typeof mockDeep<DbClient>>;
   let repository: UsersRepository;
 
   beforeEach(() => {
-    mockDb = {
-      user: {
-        findMany: vi.fn(),
-        findFirst: vi.fn(),
-      },
-    };
-    repository = new UsersRepository(mockDb as unknown as DbClient);
+    mockDb = mockDeep<DbClient>();
+    repository = new UsersRepository(mockDb);
   });
 
   describe("loadAll", () => {

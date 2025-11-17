@@ -1,36 +1,17 @@
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  vi,
-  type MockedFunction,
-} from "vitest";
+/* eslint-disable @typescript-eslint/unbound-method */
+import { describe, it, expect, beforeEach } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 import { JobChatMessageRepository } from "./job_chat_message.repository";
 import type { DbClient } from "~/server/db";
 import type { JobChatMessage as PrismaJobChatMessage } from "generated/prisma";
 
 describe("JobChatMessageRepository", () => {
-  let mockDb: {
-    jobChatMessage: {
-      create: MockedFunction<
-        (args: { data: unknown }) => Promise<PrismaJobChatMessage>
-      >;
-      findMany: MockedFunction<
-        (args?: { where?: { jobId: number } }) => Promise<PrismaJobChatMessage[]>
-      >;
-    };
-  };
+  let mockDb: ReturnType<typeof mockDeep<DbClient>>;
   let repository: JobChatMessageRepository;
 
   beforeEach(() => {
-    mockDb = {
-      jobChatMessage: {
-        create: vi.fn(),
-        findMany: vi.fn(),
-      },
-    };
-    repository = new JobChatMessageRepository(mockDb as unknown as DbClient);
+    mockDb = mockDeep<DbClient>();
+    repository = new JobChatMessageRepository(mockDb);
   });
 
   describe("create", () => {

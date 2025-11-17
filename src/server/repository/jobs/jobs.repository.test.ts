@@ -1,50 +1,18 @@
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  vi,
-  type MockedFunction,
-} from "vitest";
+/* eslint-disable @typescript-eslint/unbound-method */
+import { describe, it, expect, beforeEach } from "vitest";
+import { mockDeep } from "vitest-mock-extended";
 import { JobsRepository } from "./jobs.repository";
 import type { DbClient } from "~/server/db";
 import type { Job as PrismaJob } from "generated/prisma";
 import { JobStatus } from "~/models/job";
 
 describe("JobsRepository", () => {
-  let mockDb: {
-    job: {
-      findMany: MockedFunction<
-        (args?: {
-          skip?: number;
-          take?: number;
-          where?: unknown;
-          orderBy?: unknown;
-        }) => Promise<PrismaJob[]>
-      >;
-      findFirst: MockedFunction<
-        (args?: { where?: unknown }) => Promise<PrismaJob | null>
-      >;
-      create: MockedFunction<(args: { data: unknown }) => Promise<PrismaJob>>;
-      update: MockedFunction<
-        (args: { where: { id: number }; data: unknown }) => Promise<PrismaJob>
-      >;
-      count: MockedFunction<(args?: { where?: unknown }) => Promise<number>>;
-    };
-  };
+  let mockDb: ReturnType<typeof mockDeep<DbClient>>;
   let repository: JobsRepository;
 
   beforeEach(() => {
-    mockDb = {
-      job: {
-        findMany: vi.fn(),
-        findFirst: vi.fn(),
-        create: vi.fn(),
-        update: vi.fn(),
-        count: vi.fn(),
-      },
-    };
-    repository = new JobsRepository(mockDb as unknown as DbClient);
+    mockDb = mockDeep<DbClient>();
+    repository = new JobsRepository(mockDb);
   });
 
   describe("load", () => {

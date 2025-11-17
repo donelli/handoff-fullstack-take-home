@@ -4,7 +4,7 @@ const config = {
   tabWidth: 2,
   semi: true,
   singleQuote: false,
-  endOfLine: "crlf",
+  endOfLine: "lf",
 };
 
 export default config;

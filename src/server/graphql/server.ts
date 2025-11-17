@@ -21,6 +21,7 @@ export function createApolloServer() {
   const jobsService = new JobsService(jobsRepository);
   const jobChatMessageService = new JobChatMessageService(
     jobChatMessageRepository,
+    jobsRepository,
   );
 
   return new ApolloServer<RequestContext>({

@@ -335,10 +335,11 @@ const NotFoundPage = () => {
     <DetailsPageLayout title="Job Details">
       <div className={styles.notFoundContainer}>
         <h2 className={styles.notFoundHeading}>Job Not Found</h2>
+        <p className={styles.notFoundParagraph}>
+          The job you&apos;re looking for doesn&apos;t exist or you don&apos;t
+          have permission to access it.
+        </p>
       </div>
-      <p className={styles.notFoundParagraph}>
-        The job you&apos;re looking for doesn&apos;t exist or has been removed.
-      </p>
     </DetailsPageLayout>
   );
 };

@@ -107,7 +107,7 @@ export class JobsService {
       throw new ProtectedRouteError();
     }
 
-    const job = await this.jobsRepository.loadById(id);
+    const job = await this.jobsRepository.loadById(id, context.userData.id);
 
     return job;
   }

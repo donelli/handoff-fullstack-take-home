@@ -150,10 +150,26 @@ export class JobsRepository {
     return this.mapJobToDomain(result);
   }
 
-  async loadById(id: number) {
+  async loadById(id: number, userIdForPermissionCheck: number) {
     const jobResult = await this.db.job.findFirst({
       where: {
         id,
+        OR: [
+          {
+            createdByUserId: {
+              equals: userIdForPermissionCheck,
+            },
+          },
+          {
+            homeowners: {
+              some: {
+                id: {
+                  equals: userIdForPermissionCheck,
+                },
+              },
+            },
+          },
+        ],
       },
     });
 
